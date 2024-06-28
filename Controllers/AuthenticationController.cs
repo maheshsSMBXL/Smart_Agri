@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
 
 namespace Agri_Smart.Controllers
@@ -101,6 +102,15 @@ namespace Agri_Smart.Controllers
                 signingCredentials: creds);
 
             return new JwtSecurityTokenHandler().WriteToken(token);
+        }
+        private int GenerateRandomNo()
+        {
+            int _min = 100000;
+            int _max = 999999;
+
+            var randomGenerator = RandomNumberGenerator.GetInt32(_min, _max);
+
+            return randomGenerator;
         }
 
         //public IActionResult Index()
