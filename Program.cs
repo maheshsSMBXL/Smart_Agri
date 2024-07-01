@@ -1,4 +1,5 @@
 using Agri_Smart.data;
+using Agri_Smart.Services;
 using InfluxDB.Client;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
@@ -11,9 +12,12 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 
 builder.Services.AddControllers();
+builder.Services.AddSingleton<SmsService>();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+builder.Services.AddScoped<IApplicationDbContext, ApplicationDbContext>();
 
 // For Entity Framework
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
@@ -48,6 +52,14 @@ JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
     };
 });
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowOrigin",
+        builder => builder.WithOrigins("*")
+        .AllowAnyHeader()
+        .AllowAnyMethod());
+});
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -58,6 +70,7 @@ var app = builder.Build();
 //}
 app.UseSwagger();
 app.UseSwaggerUI();
+app.UseCors("AllowOrigin");
 
 app.UseHttpsRedirection();
 

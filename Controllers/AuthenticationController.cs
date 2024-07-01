@@ -102,16 +102,7 @@ namespace Agri_Smart.Controllers
                 signingCredentials: creds);
 
             return new JwtSecurityTokenHandler().WriteToken(token);
-        }
-        private int GenerateRandomNo()
-        {
-            int _min = 100000;
-            int _max = 999999;
-
-            var randomGenerator = RandomNumberGenerator.GetInt32(_min, _max);
-
-            return randomGenerator;
-        }
+        }        
 
         //public IActionResult Index()
         //{
