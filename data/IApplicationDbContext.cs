@@ -7,6 +7,7 @@ namespace Agri_Smart.data
     public interface IApplicationDbContext
     {
         DbSet<Intractions> Interactions { get; set; }
+        DbSet<UserInfo> UserInfo { get; set; }
 
         int SaveChanges();
         DataTable ExecuteReader

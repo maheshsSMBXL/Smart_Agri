@@ -16,6 +16,7 @@ namespace Agri_Smart.data
             base.OnModelCreating(builder);
         }
         public DbSet<Intractions> Interactions { get; set; }
+        public DbSet<UserInfo> UserInfo { get; set; }
 
         public override int SaveChanges()
         {
