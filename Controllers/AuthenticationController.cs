@@ -91,7 +91,7 @@ namespace Agri_Smart.Controllers
             if (userExist != null)
             {
                 var ExistingUserToken = GenerateJwtToken(userExist);
-                return Ok(new { Status = "Success", Message = "User Already Exist.", UserExist = true, Token = ExistingUserToken });
+                return Ok(new { Status = "Success", Message = "User Already Exist.", Token = ExistingUserToken });
             }
             //Save user in database
             IdentityUser user = new()
