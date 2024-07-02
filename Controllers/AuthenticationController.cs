@@ -1,4 +1,5 @@
-﻿using Agri_Smart.Models;
+﻿using Agri_Smart.data;
+using Agri_Smart.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -18,14 +19,17 @@ namespace Agri_Smart.Controllers
         private readonly UserManager<IdentityUser> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly IConfiguration _configuration;
+        private readonly IApplicationDbContext _dbcontext;
 
         public AuthenticationController(UserManager<IdentityUser> userManager,
-            RoleManager<IdentityRole> roleManager, IConfiguration configuration, SignInManager<IdentityUser> signInManager)
+            RoleManager<IdentityRole> roleManager, IConfiguration configuration,
+            SignInManager<IdentityUser> signInManager, IApplicationDbContext dbcontext)
         { 
             _userManager = userManager;
             _roleManager = roleManager;
             _configuration = configuration;
             _signInManager = signInManager;
+            _dbcontext = dbcontext;
         }
 
         [HttpPost]
@@ -87,11 +91,12 @@ namespace Agri_Smart.Controllers
         {
             //check user exist
             var userExist = await _userManager.Users.FirstOrDefaultAsync(u => u.PhoneNumber == phoneNumber.phoneNumber);
+            var userInfo = await _dbcontext.UserInfo.FirstOrDefaultAsync(u => u.PhoneNumber == phoneNumber.phoneNumber);
             //var userExist = await _userManager.FindByNameAsync(registerUser.UserName);
             if (userExist != null)
             {
                 var ExistingUserToken = GenerateJwtToken(userExist);
-                return Ok(new { Status = "Success", Message = "User Already Exist.", Token = ExistingUserToken });
+                return Ok(new { Status = "Success", Message = "User Already Exist.", Token = ExistingUserToken, OnBoardStatus = userInfo?.OnBoardingStatus });
             }
             //Save user in database
             IdentityUser user = new()
@@ -103,7 +108,7 @@ namespace Agri_Smart.Controllers
             var result = await _userManager.CreateAsync(user);
             var token = GenerateJwtToken(user);
             return result.Succeeded
-                ? Ok(new { Status = "Success", Message = "User Created Successfully", Token = token })
+                ? Ok(new { Status = "Success", Message = "User Created Successfully", Token = token, OnBoardStatus = userInfo?.OnBoardingStatus })
                 : Ok(new { Status = "Error", Message = "User Failed to Created" });
         }
 
