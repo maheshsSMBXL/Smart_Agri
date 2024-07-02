@@ -21,7 +21,7 @@ namespace Agri_Smart.Controllers
 
         public AuthenticationController(UserManager<IdentityUser> userManager,
             RoleManager<IdentityRole> roleManager, IConfiguration configuration, SignInManager<IdentityUser> signInManager)
-        {
+        { 
             _userManager = userManager;
             _roleManager = roleManager;
             _configuration = configuration;
@@ -81,14 +81,38 @@ namespace Agri_Smart.Controllers
 
             return Ok(new Response { Status = "Success", Message = "User LoggedIn Successfully", Token = token });
         }
+        [HttpPost]
+        [Route("ValidateMobileNumber")]
+        public async Task<IActionResult> ValidateMobileNumber([FromBody]PhoneNumber phoneNumber)
+        {
+            //check user exist
+            var userExist = await _userManager.Users.FirstOrDefaultAsync(u => u.PhoneNumber == phoneNumber.phoneNumber);
+            //var userExist = await _userManager.FindByNameAsync(registerUser.UserName);
+            if (userExist != null)
+            {
+                var ExistingUserToken = GenerateJwtToken(userExist);
+                return Ok(new { Status = "Success", Message = "User Already Exist.", UserExist = true, Token = ExistingUserToken });
+            }
+            //Save user in database
+            IdentityUser user = new()
+            {
+                UserName = phoneNumber.phoneNumber,
+                PhoneNumber = phoneNumber.phoneNumber,
+                SecurityStamp = Guid.NewGuid().ToString(),
+            };
+            var result = await _userManager.CreateAsync(user);
+            var token = GenerateJwtToken(user);
+            return result.Succeeded
+                ? Ok(new { Status = "Success", Message = "User Created Successfully", Token = token })
+                : Ok(new { Status = "Error", Message = "User Failed to Created" });
+        }
 
         private string GenerateJwtToken(IdentityUser user)
         {
             var claims = new[]
             {
-            new Claim(JwtRegisteredClaimNames.Sub, user.UserName),
-            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-            new Claim(ClaimTypes.NameIdentifier, user.Id)
+            new Claim(JwtRegisteredClaimNames.Sub, user.PhoneNumber),
+            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
         };
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
