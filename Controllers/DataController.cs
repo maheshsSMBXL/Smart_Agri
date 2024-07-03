@@ -9,9 +9,11 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Agri_Smart.Models;
 using Agri_Smart.data;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Agri_Smart.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("api/[controller]")]
     public class DataController : ControllerBase
@@ -38,7 +40,7 @@ namespace Agri_Smart.Controllers
         {
             var timeRangeStart = "2024-01-01T06:02:00.000Z";
             var timeRangeStop = "2090-07-01T06:02:00.000Z";
-            string flux = $"from(bucket: \"{_bucket}\") |> range(start: {timeRangeStart}, stop: {timeRangeStop}) |> filter(fn: (r) => r[\"_measurement\"] == \"sensor_data\") |> filter(fn: (r) => r[\"tenant_id\"] == \"{request.tenantId}\")";
+            string flux = $"from(bucket: \"{_bucket}\") |> range(start: {timeRangeStart}, stop: {timeRangeStop}) |> filter(fn: (r) => r[\"_measurement\"] == \"treesandrays_data\") |> filter(fn: (r) => r[\"tenant_id\"] == \"{request.tenantId}\")";
             var fluxTables = await _influxDBClient.GetQueryApi().QueryAsync(flux, _org);
 
             var result = new List<Dictionary<string, object>>();
