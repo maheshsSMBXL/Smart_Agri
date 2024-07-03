@@ -76,6 +76,14 @@ namespace Agri_Smart.Controllers
 
             return Ok(new { Status = "Success", Message = "User OnBoard data saved successfully.", OnBoardStatus = request?.OnBoardingStatus });
         }
+        [HttpGet]
+        [Route("GetUserInfo")]
+        public async Task<IActionResult> GetUserInfo()
+        {
+            var mobileNumber = User?.Claims?.FirstOrDefault(c => c.Type == "MobileNumber")?.Value;
+            var UserInfo = await _dbcontext.UserInfo.FirstOrDefaultAsync(a => a.PhoneNumber == mobileNumber);
+            return Ok(UserInfo);
+        }
 
         //public IActionResult Index()
         //{
