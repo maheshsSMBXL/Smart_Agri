@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Identity;
 using Agri_Smart.Models;
 using Agri_Smart.data;
 using Microsoft.AspNetCore.Authorization;
+using System.IdentityModel.Tokens.Jwt;
 
 namespace Agri_Smart.Controllers
 {
@@ -34,13 +35,17 @@ namespace Agri_Smart.Controllers
             _dbcontext = dbcontext;
         }
 
-        [HttpPost]
+        [HttpGet]
         [Route("GetSensorData")]
-        public async Task<IActionResult> GetSensorData([FromBody] InfluxBucketRange request)
+        public async Task<IActionResult> GetSensorData()
         {
+
+            var mobileNumber = User?.Claims?.FirstOrDefault(c => c.Type == "MobileNumber")?.Value;
+
+
             var timeRangeStart = "2024-01-01T06:02:00.000Z";
             var timeRangeStop = "2090-07-01T06:02:00.000Z";
-            string flux = $"from(bucket: \"{_bucket}\") |> range(start: {timeRangeStart}, stop: {timeRangeStop}) |> filter(fn: (r) => r[\"_measurement\"] == \"treesandrays_data\") |> filter(fn: (r) => r[\"tenant_id\"] == \"{request.tenantId}\")";
+            string flux = $"from(bucket: \"{_bucket}\") |> range(start: {timeRangeStart}, stop: {timeRangeStop}) |> filter(fn: (r) => r[\"_measurement\"] == \"treesandrays_data\") |> filter(fn: (r) => r[\"tenant_id\"] == \"{"CC:7B:5C:35:32:9C"}\")";
             var fluxTables = await _influxDBClient.GetQueryApi().QueryAsync(flux, _org);
 
             var result = new List<Dictionary<string, object>>();

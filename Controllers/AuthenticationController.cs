@@ -106,7 +106,7 @@ namespace Agri_Smart.Controllers
                 SecurityStamp = Guid.NewGuid().ToString(),
             };
             var result = await _userManager.CreateAsync(user);
-            var token = GenerateJwtToken(user);
+            var token = GenerateJwtToken(phoneNumber.phoneNumber);
             return result.Succeeded
                 ? Ok(new { Status = "Success", Message = "User Created Successfully", Token = token, OnBoardStatus = userInfo?.OnBoardingStatus })
                 : Ok(new { Status = "Error", Message = "User Failed to Created" });
@@ -131,7 +131,27 @@ namespace Agri_Smart.Controllers
                 signingCredentials: creds);
 
             return new JwtSecurityTokenHandler().WriteToken(token);
-        }        
+        }
+
+        private string GenerateJwtToken(string mobileNumber)
+        {
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var key = Encoding.ASCII.GetBytes(_configuration["Jwt:Key"]);
+
+            var tokenDescriptor = new SecurityTokenDescriptor
+            {
+                Subject = new ClaimsIdentity(new[]
+                {
+                    new Claim(ClaimTypes.Name, mobileNumber),
+                    new Claim("MobileNumber", mobileNumber) // Adding mobile number claim
+                }),
+                Expires = DateTime.UtcNow.AddDays(7),
+                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
+            };
+
+            var token = tokenHandler.CreateToken(tokenDescriptor);
+            return tokenHandler.WriteToken(token);
+        }
 
         //public IActionResult Index()
         //{
