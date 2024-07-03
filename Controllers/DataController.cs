@@ -41,7 +41,7 @@ namespace Agri_Smart.Controllers
         {
 
             var mobileNumber = User?.Claims?.FirstOrDefault(c => c.Type == "MobileNumber")?.Value;
-
+            var UserInfo = await _dbcontext.UserInfo.FirstOrDefaultAsync(a => a.PhoneNumber == mobileNumber);
 
             var timeRangeStart = "2024-01-01T06:02:00.000Z";
             var timeRangeStop = "2090-07-01T06:02:00.000Z";
