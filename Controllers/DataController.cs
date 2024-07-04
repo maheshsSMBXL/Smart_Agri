@@ -48,16 +48,19 @@ namespace Agri_Smart.Controllers
             string flux = $"from(bucket: \"{_bucket}\") " +
                 $"|> range(start: {timeRangeStart}, stop: {timeRangeStop}) " +
                 $"|> filter(fn: (r) => r[\"_measurement\"] == \"treesandrays_data\") " +
-                $"|> filter(fn: (r) => r[\"tenant_id\"] == \"CC:7B:5C:35:32:9C\") " +
-                $"|> filter(fn: (r) => r[\"_field\"] == \"humidity_percentage\" or r[\"_field\"] == \"moisture\" or r[\"_field\"] == \"moisture_percentage\" or r[\"_field\"] == \"nitrogen\" or r[\"_field\"] == \"phosphorus\")";
+                $"|> filter(fn: (r) => r[\"tenant_id\"] == \"CC:7B:5C:35:32:9C\") ";
+                //$"|> filter(fn: (r) => r[\"_field\"] == \"humidity_percentage\" or r[\"_field\"] == \"moisture\" or r[\"_field\"] == \"moisture_percentage\" or r[\"_field\"] == \"nitrogen\" or r[\"_field\"] == \"phosphorus\")";
 
             var fluxTables = await _influxDBClient.GetQueryApi().QueryAsync(flux, _org);
 
+            var temperatureCelsius = new List<Dictionary<string, object>>();
+            var temperatureFahrenheit = new List<Dictionary<string, object>>();
             var humidityPercentageValues = new List<Dictionary<string, object>>();
             var moistureValues = new List<Dictionary<string, object>>();
             var moisturePercentageValues = new List<Dictionary<string, object>>();
             var nitrogenValues = new List<Dictionary<string, object>>();
             var phosphorusValues = new List<Dictionary<string, object>>();
+            var potassiumValues = new List<Dictionary<string, object>>();
 
             foreach (FluxTable table in fluxTables)
             {
@@ -80,6 +83,12 @@ namespace Agri_Smart.Controllers
 
                     switch (field)
                     {
+                        case "temperature_celsius":
+                            temperatureCelsius.Add(recordValues);
+                            break;
+                        case "temperature_fahrenheit":
+                            temperatureFahrenheit.Add(recordValues);
+                            break;
                         case "humidity_percentage":
                             humidityPercentageValues.Add(recordValues);
                             break;
@@ -95,17 +104,23 @@ namespace Agri_Smart.Controllers
                         case "phosphorus":
                             phosphorusValues.Add(recordValues);
                             break;
+                        case "potassium":
+                            potassiumValues.Add(recordValues);
+                            break;
                     }
                 }
             }
 
             var result = new
             {
+                TemperatureCelsiusValues = temperatureCelsius,
+                TemperatureFahrenheitValues = temperatureFahrenheit,
                 HumidityPercentageValues = humidityPercentageValues,
                 MoistureValues = moistureValues,
                 MoisturePercentageValues = moisturePercentageValues,
                 NitrogenValues = nitrogenValues,
-                PhosphorusValues = phosphorusValues
+                PhosphorusValues = phosphorusValues,
+                PotassiumValues = potassiumValues,
             };
 
             return Ok(result);
