@@ -182,14 +182,14 @@ namespace Agri_Smart.Controllers
 
             var result = new
             {
-                TemperatureCelsiusValues = latestValues.ContainsKey("temperature_celsius") ? latestValues["temperature_celsius"] : null,
-                TemperatureFahrenheitValues = latestValues.ContainsKey("temperature_fahrenheit") ? latestValues["temperature_fahrenheit"] : null,
-                HumidityPercentageValues = latestValues.ContainsKey("humidity_percentage") ? latestValues["humidity_percentage"] : null,
-                MoistureValues = latestValues.ContainsKey("moisture") ? latestValues["moisture"] : null,
-                MoisturePercentageValues = latestValues.ContainsKey("moisture_percentage") ? latestValues["moisture_percentage"] : null,
-                NitrogenValues = latestValues.ContainsKey("nitrogen") ? latestValues["nitrogen"] : null,
-                PhosphorusValues = latestValues.ContainsKey("phosphorus") ? latestValues["phosphorus"] : null,
-                PotassiumValues = latestValues.ContainsKey("potassium") ? latestValues["potassium"] : null
+                TemperatureCelsius = latestValues.ContainsKey("temperature_celsius") ? latestValues["temperature_celsius"]["_value"] : null,
+                TemperatureFahrenheit = latestValues.ContainsKey("temperature_fahrenheit") ? latestValues["temperature_fahrenheit"]["_value"] : null,
+                HumidityPercentage = latestValues.ContainsKey("humidity_percentage") ? latestValues["humidity_percentage"]["_value"] : null,
+                Moisture = latestValues.ContainsKey("moisture") ? latestValues["moisture"]["_value"] : null,
+                MoisturePercentage = latestValues.ContainsKey("moisture_percentage") ? latestValues["moisture_percentage"]["_value"] : null,
+                Nitrogen = latestValues.ContainsKey("nitrogen") ? latestValues["nitrogen"]["_value"] : null,
+                Phosphorus = latestValues.ContainsKey("phosphorus") ? latestValues["phosphorus"]["_value"] : null,
+                Potassium = latestValues.ContainsKey("potassium") ? latestValues["potassium"]["_value"] : null
             };
 
             return Ok(result);
