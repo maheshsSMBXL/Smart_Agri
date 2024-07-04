@@ -95,7 +95,7 @@ namespace Agri_Smart.Controllers
             //var userExist = await _userManager.FindByNameAsync(registerUser.UserName);
             if (userExist != null)
             {
-                var ExistingUserToken = GenerateJwtToken(userExist);
+                var ExistingUserToken = GenerateJwtToken(phoneNumber.phoneNumber);
                 return Ok(new { Status = "Success", Message = "User Already Exist.", Token = ExistingUserToken, OnBoardStatus = userInfo?.OnBoardingStatus });
             }
             //Save user in database
