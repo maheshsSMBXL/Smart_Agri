@@ -63,23 +63,37 @@ namespace Agri_Smart.Controllers
             {
                 foreach (FluxRecord record in table.Records)
                 {
+                    // Log the raw record values for debugging
+                    Console.WriteLine($"Raw Record Values: {string.Join(", ", record.Values.Select(kv => $"{kv.Key}: {kv.Value}"))}");
+
                     var field = record.Values["_field"].ToString();
+                    var recordValues = new Dictionary<string, object>
+                    {
+                        { "_start", record.Values.ContainsKey("_start") ? record.Values["_start"].ToString() : null },
+                        { "_stop", record.Values.ContainsKey("_stop") ? record.Values["_stop"].ToString() : null },
+                        { "_time", record.Values.ContainsKey("_time") ? record.Values["_time"].ToString() : null }, // Extract _time as string
+                        { "_value", record.Values["_value"] },
+                        { "_field", record.Values["_field"] },
+                        { "_measurement", record.Values["_measurement"] },
+                        { "tenant_id", record.Values["tenant_id"] }
+                    };
+
                     switch (field)
                     {
                         case "humidity_percentage":
-                            humidityPercentageValues.Add(record.Values);
+                            humidityPercentageValues.Add(recordValues);
                             break;
                         case "moisture":
-                            moistureValues.Add(record.Values);
+                            moistureValues.Add(recordValues);
                             break;
                         case "moisture_percentage":
-                            moisturePercentageValues.Add(record.Values);
+                            moisturePercentageValues.Add(recordValues);
                             break;
                         case "nitrogen":
-                            nitrogenValues.Add(record.Values);
+                            nitrogenValues.Add(recordValues);
                             break;
                         case "phosphorus":
-                            phosphorusValues.Add(record.Values);
+                            phosphorusValues.Add(recordValues);
                             break;
                     }
                 }
@@ -95,6 +109,7 @@ namespace Agri_Smart.Controllers
             };
 
             return Ok(result);
+
         }
         [HttpPost]
         [Route("SaveOnBoardData")]
