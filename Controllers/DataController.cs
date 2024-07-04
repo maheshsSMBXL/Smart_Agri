@@ -111,6 +111,75 @@ namespace Agri_Smart.Controllers
             return Ok(result);
 
         }
+        [HttpGet]
+        [Route("GetSensorLatestData")]
+        public async Task<IActionResult> GetSensorLatestData()
+        {
+            var mobileNumber = User?.Claims?.FirstOrDefault(c => c.Type == "MobileNumber")?.Value;
+            var UserInfo = await _dbcontext.UserInfo.FirstOrDefaultAsync(a => a.PhoneNumber == mobileNumber);
+
+            var timeRangeStart = "2024-01-01T06:02:00.000Z";
+            var timeRangeStop = "2090-07-01T06:02:00.000Z";
+            string flux = $"from(bucket: \"{_bucket}\") " +
+                $"|> range(start: {timeRangeStart}, stop: {timeRangeStop}) " +
+                $"|> filter(fn: (r) => r[\"_measurement\"] == \"treesandrays_data\") " +
+                $"|> filter(fn: (r) => r[\"tenant_id\"] == \"CC:7B:5C:35:32:9C\") "; 
+                //$"|> filter(fn: (r) => r[\"_field\"] == \"humidity_percentage\" or r[\"_field\"] == \"moisture\" or r[\"_field\"] == \"moisture_percentage\" or r[\"_field\"] == \"nitrogen\" or r[\"_field\"] == \"phosphorus\")";
+
+            var fluxTables = await _influxDBClient.GetQueryApi().QueryAsync(flux, _org);
+
+            var latestValues = new Dictionary<string, Dictionary<string, object>>();
+
+            foreach (FluxTable table in fluxTables)
+            {
+                foreach (FluxRecord record in table.Records)
+                {
+                    // Log the raw record values for debugging
+                    Console.WriteLine($"Raw Record Values: {string.Join(", ", record.Values.Select(kv => $"{kv.Key}: {kv.Value}"))}");
+
+                    var field = record.Values["_field"].ToString();
+                    var recordValues = new Dictionary<string, object>
+            {
+                { "_start", record.Values.ContainsKey("_start") ? record.Values["_start"].ToString() : null },
+                { "_stop", record.Values.ContainsKey("_stop") ? record.Values["_stop"].ToString() : null },
+                { "_time", record.Values.ContainsKey("_time") ? record.Values["_time"].ToString() : null }, // Extract _time as string
+                { "_value", record.Values["_value"] },
+                { "_field", record.Values["_field"] },
+                { "_measurement", record.Values["_measurement"] },
+                { "tenant_id", record.Values["tenant_id"] }
+            };
+
+                    if (latestValues.ContainsKey(field))
+                    {
+                        var existingTime = DateTime.Parse(latestValues[field]["_time"].ToString());
+                        var newTime = DateTime.Parse(recordValues["_time"].ToString());
+                        if (newTime > existingTime)
+                        {
+                            latestValues[field] = recordValues;
+                        }
+                    }
+                    else
+                    {
+                        latestValues[field] = recordValues;
+                    }
+                }
+            }
+
+            var result = new
+            {
+                TemperatureCelsiusValues = latestValues.ContainsKey("temperature_celsius") ? latestValues["temperature_celsius"] : null,
+                TemperatureFahrenheitValues = latestValues.ContainsKey("temperature_fahrenheit") ? latestValues["temperature_fahrenheit"] : null,
+                HumidityPercentageValues = latestValues.ContainsKey("humidity_percentage") ? latestValues["humidity_percentage"] : null,
+                MoistureValues = latestValues.ContainsKey("moisture") ? latestValues["moisture"] : null,
+                MoisturePercentageValues = latestValues.ContainsKey("moisture_percentage") ? latestValues["moisture_percentage"] : null,
+                NitrogenValues = latestValues.ContainsKey("nitrogen") ? latestValues["nitrogen"] : null,
+                PhosphorusValues = latestValues.ContainsKey("phosphorus") ? latestValues["phosphorus"] : null,
+                PotassiumValues = latestValues.ContainsKey("potassium") ? latestValues["potassium"] : null
+            };
+
+            return Ok(result);
+        }
+
         [HttpPost]
         [Route("SaveOnBoardData")]
         public async Task<IActionResult> SaveOnBoardData([FromBody] UserInfo request)
