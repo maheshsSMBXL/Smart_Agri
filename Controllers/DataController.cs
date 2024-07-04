@@ -45,17 +45,55 @@ namespace Agri_Smart.Controllers
 
             var timeRangeStart = "2024-01-01T06:02:00.000Z";
             var timeRangeStop = "2090-07-01T06:02:00.000Z";
-            string flux = $"from(bucket: \"{_bucket}\") |> range(start: {timeRangeStart}, stop: {timeRangeStop}) |> filter(fn: (r) => r[\"_measurement\"] == \"treesandrays_data\") |> filter(fn: (r) => r[\"tenant_id\"] == \"{"CC:7B:5C:35:32:9C"}\")";
+            string flux = $"from(bucket: \"{_bucket}\") " +
+                $"|> range(start: {timeRangeStart}, stop: {timeRangeStop}) " +
+                $"|> filter(fn: (r) => r[\"_measurement\"] == \"treesandrays_data\") " +
+                $"|> filter(fn: (r) => r[\"tenant_id\"] == \"CC:7B:5C:35:32:9C\") " +
+                $"|> filter(fn: (r) => r[\"_field\"] == \"humidity_percentage\" or r[\"_field\"] == \"moisture\" or r[\"_field\"] == \"moisture_percentage\" or r[\"_field\"] == \"nitrogen\" or r[\"_field\"] == \"phosphorus\")";
+
             var fluxTables = await _influxDBClient.GetQueryApi().QueryAsync(flux, _org);
 
-            var result = new List<Dictionary<string, object>>();
+            var humidityPercentageValues = new List<Dictionary<string, object>>();
+            var moistureValues = new List<Dictionary<string, object>>();
+            var moisturePercentageValues = new List<Dictionary<string, object>>();
+            var nitrogenValues = new List<Dictionary<string, object>>();
+            var phosphorusValues = new List<Dictionary<string, object>>();
+
             foreach (FluxTable table in fluxTables)
             {
                 foreach (FluxRecord record in table.Records)
                 {
-                    result.Add(record.Values);
+                    var field = record.Values["_field"].ToString();
+                    switch (field)
+                    {
+                        case "humidity_percentage":
+                            humidityPercentageValues.Add(record.Values);
+                            break;
+                        case "moisture":
+                            moistureValues.Add(record.Values);
+                            break;
+                        case "moisture_percentage":
+                            moisturePercentageValues.Add(record.Values);
+                            break;
+                        case "nitrogen":
+                            nitrogenValues.Add(record.Values);
+                            break;
+                        case "phosphorus":
+                            phosphorusValues.Add(record.Values);
+                            break;
+                    }
                 }
             }
+
+            var result = new
+            {
+                HumidityPercentageValues = humidityPercentageValues,
+                MoistureValues = moistureValues,
+                MoisturePercentageValues = moisturePercentageValues,
+                NitrogenValues = nitrogenValues,
+                PhosphorusValues = phosphorusValues
+            };
+
             return Ok(result);
         }
         [HttpPost]
