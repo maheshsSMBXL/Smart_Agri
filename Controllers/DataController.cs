@@ -36,15 +36,15 @@ namespace Agri_Smart.Controllers
         }
 
         [HttpGet]
-        [Route("GetSensorData")]
-        public async Task<IActionResult> GetSensorData()
+        [Route("GetSensorData/{timeRangeStart}/{timeRangeStop}")]
+        public async Task<IActionResult> GetSensorData(string timeRangeStart,string timeRangeStop)
         {
 
             var mobileNumber = User?.Claims?.FirstOrDefault(c => c.Type == "MobileNumber")?.Value;
             var UserInfo = await _dbcontext.UserInfo.FirstOrDefaultAsync(a => a.PhoneNumber == mobileNumber);
 
-            var timeRangeStart = "2024-01-01T06:02:00.000Z";
-            var timeRangeStop = "2090-07-01T06:02:00.000Z";
+            //var timeRangeStart = "2024-01-01T06:02:00.000Z";
+            //var timeRangeStop = "2090-07-01T06:02:00.000Z";
             string flux = $"from(bucket: \"{_bucket}\") " +
                 $"|> range(start: {timeRangeStart}, stop: {timeRangeStop}) " +
                 $"|> filter(fn: (r) => r[\"_measurement\"] == \"treesandrays_data\") " +
