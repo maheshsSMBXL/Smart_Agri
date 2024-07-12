@@ -222,6 +222,26 @@ namespace Agri_Smart.Controllers
             return Ok(UserInfo);
         }
 
+        [AllowAnonymous]
+        [HttpPost]
+        [Route("SaveDiseases")]
+        public async Task<IActionResult> SaveDiseases([FromBody] Diseases diseases)
+        {
+            await _dbcontext.Diseases.AddAsync(diseases);
+            _dbcontext.SaveChanges();
+
+            return Ok(new { Status = "Success", Message = "Data saved successfully." });
+        }
+
+        [AllowAnonymous]
+        [HttpGet]
+        [Route("GetDiseases")]
+        public async Task<IActionResult> GetDiseases()
+        {
+            var Diseases = await _dbcontext.Diseases.ToListAsync();
+            return Ok(Diseases);
+        }
+
         //public IActionResult Index()
         //{
         //    return View();

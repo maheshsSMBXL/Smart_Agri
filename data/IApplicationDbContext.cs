@@ -8,6 +8,7 @@ namespace Agri_Smart.data
     {
         DbSet<Intractions> Interactions { get; set; }
         DbSet<UserInfo> UserInfo { get; set; }
+        DbSet<Diseases> Diseases { get; set; }
 
         int SaveChanges();
         DataTable ExecuteReader
