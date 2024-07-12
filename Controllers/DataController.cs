@@ -241,6 +241,22 @@ namespace Agri_Smart.Controllers
             var Diseases = await _dbcontext.Diseases.ToListAsync();
             return Ok(Diseases);
         }
+        [HttpPost]
+        [Route("UpdateFireBaseToken/{fireBaseToken}")]
+        public async Task<IActionResult> UpdateFireBaseToken(string fireBaseToken)
+        {
+            var mobileNumber = User?.Claims?.FirstOrDefault(c => c.Type == "MobileNumber")?.Value;
+            var userInfo = await _dbcontext.UserInfo.FirstOrDefaultAsync(a => a.PhoneNumber == mobileNumber);
+
+            if (userInfo != null) 
+            {
+                userInfo.FireBaseToken = fireBaseToken;
+                _dbcontext.SaveChanges();
+                return Ok(new { Status = "Success", Message = "Data saved successfully." });
+            }
+
+            return Ok();
+        }
 
         //public IActionResult Index()
         //{

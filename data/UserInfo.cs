@@ -21,6 +21,6 @@ namespace Agri_Smart.data
         public DateTime? CropGrowingStartDate { get; set; }
         public bool? OnBoardingStatus { get; set; }
         public string? TenantId { get; set; }
-
+        public string? FireBaseToken { get; set; }
     }
 }
