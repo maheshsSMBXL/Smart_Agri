@@ -22,5 +22,7 @@ namespace Agri_Smart.data
         public bool? OnBoardingStatus { get; set; }
         public string? TenantId { get; set; }
         public string? FireBaseToken { get; set; }
+        public double? Latitude { get; set; }
+        public double? Longitude { get; set; }
     }
 }
