@@ -11,6 +11,7 @@ using Agri_Smart.Models;
 using Agri_Smart.data;
 using Microsoft.AspNetCore.Authorization;
 using System.IdentityModel.Tokens.Jwt;
+using InfluxDB.Client.Writes;
 
 namespace Agri_Smart.Controllers
 {
@@ -126,6 +127,45 @@ namespace Agri_Smart.Controllers
             return Ok(result);
 
         }
+        [AllowAnonymous]
+        [HttpPost]
+        [Route("InsertUnstableData")]
+        public async Task<IActionResult> InsertUnstableData([FromBody] List<UnstableData> sensorDataList)
+        {
+            // Ensure the sensorDataList is not null or empty
+            if (sensorDataList == null || !sensorDataList.Any())
+            {
+                return BadRequest(new { message = "No data provided." });
+            }
+
+            // Get the write API
+            using (var writeApi = _influxDBClient.GetWriteApi())
+            {
+                foreach (var sensorData in sensorDataList)
+                {
+                    // Create a point for each data item
+                    var point = PointData
+                        .Measurement("unstable_data_new")
+                        .Tag("tenant_id", sensorData.TenantId)
+                        .Field("soil_moisture_p", sensorData.Data.SoilMoistureP.HasValue ? sensorData.Data.SoilMoistureP.Value : double.NaN)
+                        .Field("soil_moisture_f", sensorData.Data.SoilMoistureF.HasValue ? sensorData.Data.SoilMoistureF.Value : double.NaN)
+                        .Field("temperature_c", sensorData.Data.TemperatureC.HasValue ? sensorData.Data.TemperatureC.Value : double.NaN)
+                        .Field("temperature_f", sensorData.Data.TemperatureF.HasValue ? sensorData.Data.TemperatureF.Value : double.NaN)
+                        .Field("humidity", sensorData.Data.Humidity.HasValue ? sensorData.Data.Humidity.Value : double.NaN)
+                        .Field("nitrogen", sensorData.Data.Nitrogen.HasValue ? sensorData.Data.Nitrogen.Value : double.NaN)
+                        .Field("potassium", sensorData.Data.Potassium.HasValue ? sensorData.Data.Potassium.Value : double.NaN)
+                        .Field("phosphorus", sensorData.Data.Phosphorus.HasValue ? sensorData.Data.Phosphorus.Value : double.NaN)
+                        .Timestamp(DateTime.UtcNow, WritePrecision.Ns);
+
+                    // Write the point to InfluxDB
+                    writeApi.WritePoint(point, _bucket, _org);
+                }
+            }
+
+            return Ok(new { message = "Data inserted successfully." });
+        }
+
+
         [HttpGet]
         [Route("GetSensorLatestData")]
         public async Task<IActionResult> GetSensorLatestData()
