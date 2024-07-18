@@ -13,6 +13,7 @@ namespace Agri_Smart.Controllers
     public class PredictionController : ControllerBase
     {
         private readonly InferenceSession _session;
+        private readonly InferenceSession _leafSessioin;
         private readonly ILogger<PredictionController> _logger;
 
         public PredictionController(ILogger<PredictionController> logger, IWebHostEnvironment env)
@@ -20,6 +21,58 @@ namespace Agri_Smart.Controllers
             _logger = logger;
             var modelPath = Path.Combine(env.ContentRootPath, "ML_Models", "coffee_leaf_model.onnx");
             _session = new InferenceSession(modelPath);
+            var LeafDetectionPath = Path.Combine(env.ContentRootPath, "ML_Models", "leaf_classification_model.onnx");
+            _leafSessioin = new InferenceSession(LeafDetectionPath);
+        }
+
+        [HttpPost("LeafDetection")]
+        public IActionResult Predict(IFormFile file)
+        {
+            if (file == null || file.Length == 0)
+            {
+                return BadRequest("No file uploaded.");
+            }
+
+            var inputData = PreprocessImage(file, 224, 224);
+            var tensor = new DenseTensor<float>(inputData, new[] { 1, 224, 224, 3 });
+
+            var inputs = new List<NamedOnnxValue>
+            {
+                NamedOnnxValue.CreateFromTensor("input", tensor)
+            };
+
+            using var results = _leafSessioin.Run(inputs);
+            var output = results.First().AsEnumerable<float>().ToArray();
+            var prediction = output[0];
+
+            var isLeaf = prediction > 0.5;
+            var result = isLeaf
+                ? new { status = true, message = "The image is classified as a leaf." }
+                : new { status = false, message = "The image is classified as not a leaf." };
+            return Ok(result);
+        }
+
+        private float[] PreprocessImage(IFormFile file, int targetWidth, int targetHeight)
+        {
+            using var stream = file.OpenReadStream();
+            using var image = Image.Load<Rgb24>(stream);
+
+            image.Mutate(x => x.Resize(targetWidth, targetHeight));
+
+            var imageData = new float[targetWidth * targetHeight * 3];
+            for (int y = 0; y < targetHeight; y++)
+            {
+                for (int x = 0; x < targetWidth; x++)
+                {
+                    var pixel = image[x, y];
+                    var index = (y * targetWidth + x) * 3;
+                    imageData[index] = pixel.R / 255f;
+                    imageData[index + 1] = pixel.G / 255f;
+                    imageData[index + 2] = pixel.B / 255f;
+                }
+            }
+
+            return imageData;
         }
 
         [HttpPost("predict")]
