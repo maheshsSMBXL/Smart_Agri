@@ -199,15 +199,6 @@ namespace Agri_Smart.Controllers
         [Route("SaveOnBoardData")]
         public async Task<IActionResult> SaveOnBoardData([FromBody] UserInfo request)
         {
-            //var userInfo = new UserInfo();
-            //userInfo.PhoneNumber = request.PhoneNumber;
-            //userInfo.Name = request.Name;
-            //userInfo.Email = request.Email;
-            //userInfo.Country = request.Country;
-            //userInfo.State = request.State;
-            //userInfo.District = request.District;
-            //userInfo.ZipCode = request.ZipCode;
-            //userInfo.LandSize = request.LandSize;
             await _dbcontext.UserInfo.AddAsync(request);
             _dbcontext.SaveChanges();
 
