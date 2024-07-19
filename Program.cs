@@ -75,6 +75,11 @@ builder.Services.AddCors(options =>
         .AllowAnyMethod());
 });
 
+builder.Services.AddHttpClient<FlaskApiService>(client =>
+{
+    client.BaseAddress = new Uri("http://192.168.1.174:5001"); // Your Flask API base address
+});
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

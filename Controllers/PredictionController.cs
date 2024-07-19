@@ -5,6 +5,7 @@ using SixLabors.ImageSharp.PixelFormats;
 using Trees_RaysApi.Models;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Processing;
+using Agri_Smart.Services;
 
 namespace Agri_Smart.Controllers
 {
@@ -15,14 +16,16 @@ namespace Agri_Smart.Controllers
         private readonly InferenceSession _session;
         private readonly InferenceSession _leafSessioin;
         private readonly ILogger<PredictionController> _logger;
+        private readonly FlaskApiService _flaskApiService;
 
-        public PredictionController(ILogger<PredictionController> logger, IWebHostEnvironment env)
+        public PredictionController(ILogger<PredictionController> logger, IWebHostEnvironment env, FlaskApiService flaskApiService)
         {
             _logger = logger;
             var modelPath = Path.Combine(env.ContentRootPath, "ML_Models", "coffee_leaf_model.onnx");
             _session = new InferenceSession(modelPath);
             var LeafDetectionPath = Path.Combine(env.ContentRootPath, "ML_Models", "leaf_classification_model.onnx");
             _leafSessioin = new InferenceSession(LeafDetectionPath);
+            _flaskApiService = flaskApiService;
         }
 
         [HttpPost("LeafDetection")]
@@ -147,6 +150,24 @@ namespace Agri_Smart.Controllers
 
             return data;
         }
+
+        [HttpPost("LeafDiseasePredict")]
+        public async Task<IActionResult> LeafDiseasePredict(IFormFile image)
+        {
+            if (image == null || image.Length == 0)
+                return BadRequest("Image file is missing");
+
+            var filePath = Path.GetTempFileName();
+            using (var stream = System.IO.File.Create(filePath))
+            {
+                await image.CopyToAsync(stream);
+            }
+
+            var result = await _flaskApiService.PredictLeafDiseaseAsync(filePath);
+            System.IO.File.Delete(filePath);  // Clean up the temp file
+            return Ok(result);
+        }
+
         //public IActionResult Index()
         //{
         //    return View();
