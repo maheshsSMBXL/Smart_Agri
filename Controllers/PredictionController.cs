@@ -151,8 +151,8 @@ namespace Agri_Smart.Controllers
             return data;
         }
 
-        [HttpPost("LeafDiseasePredict")]
-        public async Task<IActionResult> LeafDiseasePredict(IFormFile image)
+        [HttpPost("LeafSegmentation")]
+        public async Task<IActionResult> LeafSegmentation(IFormFile image)
         {
             if (image == null || image.Length == 0)
                 return BadRequest("Image file is missing");
