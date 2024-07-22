@@ -38,7 +38,7 @@ namespace Agri_Smart.Controllers
 
         [HttpGet]
         [Route("GetSensorData/{timeRangeStart}/{timeRangeStop}")]
-        public async Task<IActionResult> GetSensorData(string timeRangeStart,string timeRangeStop)
+        public async Task<IActionResult> GetSensorData(string tenantId, string timeRangeStart,string timeRangeStop)
         {
 
             var mobileNumber = User?.Claims?.FirstOrDefault(c => c.Type == "MobileNumber")?.Value;
@@ -49,7 +49,7 @@ namespace Agri_Smart.Controllers
             string flux = $"from(bucket: \"{_bucket}\") " +
                 $"|> range(start: {timeRangeStart}, stop: {timeRangeStop}) " +
                 $"|> filter(fn: (r) => r[\"_measurement\"] == \"treesandrays_data\") " +
-                $"|> filter(fn: (r) => r[\"tenant_id\"] == \"CC:7B:5C:35:32:9C\") ";
+                $"|> filter(fn: (r) => r[\"tenant_id\"] == {tenantId}) ";
                 //$"|> filter(fn: (r) => r[\"_field\"] == \"humidity_percentage\" or r[\"_field\"] == \"moisture\" or r[\"_field\"] == \"moisture_percentage\" or r[\"_field\"] == \"nitrogen\" or r[\"_field\"] == \"phosphorus\")";
 
             var fluxTables = await _influxDBClient.GetQueryApi().QueryAsync(flux, _org);
@@ -168,17 +168,17 @@ namespace Agri_Smart.Controllers
 
         [HttpGet]
         [Route("GetSensorLatestData")]
-        public async Task<IActionResult> GetSensorLatestData()
+        public async Task<IActionResult> GetSensorLatestData(string tenantId)
         {
             var mobileNumber = User?.Claims?.FirstOrDefault(c => c.Type == "MobileNumber")?.Value;
-            var UserInfo = await _dbcontext.UserInfo.FirstOrDefaultAsync(a => a.PhoneNumber == mobileNumber);
+            //var UserInfo = await _dbcontext.UserInfo.FirstOrDefaultAsync(a => a.PhoneNumber == mobileNumber);
 
             var timeRangeStart = "2024-01-01T06:02:00.000Z";
             var timeRangeStop = "2090-07-01T06:02:00.000Z";
             string flux = $"from(bucket: \"{_bucket}\") " +
                 $"|> range(start: {timeRangeStart}, stop: {timeRangeStop}) " +
                 $"|> filter(fn: (r) => r[\"_measurement\"] == \"treesandrays_data\") " +
-                $"|> filter(fn: (r) => r[\"tenant_id\"] == \"CC:7B:5C:35:32:9C\") "; 
+                $"|> filter(fn: (r) => r[\"tenant_id\"] == {tenantId}) "; 
                 //$"|> filter(fn: (r) => r[\"_field\"] == \"humidity_percentage\" or r[\"_field\"] == \"moisture\" or r[\"_field\"] == \"moisture_percentage\" or r[\"_field\"] == \"nitrogen\" or r[\"_field\"] == \"phosphorus\")";
 
             var fluxTables = await _influxDBClient.GetQueryApi().QueryAsync(flux, _org);
@@ -250,7 +250,14 @@ namespace Agri_Smart.Controllers
         {
             var mobileNumber = User?.Claims?.FirstOrDefault(c => c.Type == "MobileNumber")?.Value;
             var UserInfo = await _dbcontext.UserInfo.FirstOrDefaultAsync(a => a.PhoneNumber == mobileNumber);
-            return Ok(UserInfo);
+            var tenants = await _dbcontext.Devices.Where(a => a.PhoneNumber == mobileNumber).Select(a => a.TenantId).ToListAsync();
+
+            var userInfoOutPut = new UserInfoOutPut();
+            userInfoOutPut.UserInfo = UserInfo;
+            userInfoOutPut.Tenants = tenants;
+
+            //UserInfo.TenantId = string.Join(",", tenants);
+            return Ok(userInfoOutPut);
         }
 
         [AllowAnonymous]
