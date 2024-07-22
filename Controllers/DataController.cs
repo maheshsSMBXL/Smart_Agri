@@ -49,7 +49,7 @@ namespace Agri_Smart.Controllers
             string flux = $"from(bucket: \"{_bucket}\") " +
                 $"|> range(start: {timeRangeStart}, stop: {timeRangeStop}) " +
                 $"|> filter(fn: (r) => r[\"_measurement\"] == \"treesandrays_data\") " +
-                $"|> filter(fn: (r) => r[\"tenant_id\"] == {tenantId}) ";
+                $"|> filter(fn: (r) => r[\"tenant_id\"] == \"{tenantId}\") ";
                 //$"|> filter(fn: (r) => r[\"_field\"] == \"humidity_percentage\" or r[\"_field\"] == \"moisture\" or r[\"_field\"] == \"moisture_percentage\" or r[\"_field\"] == \"nitrogen\" or r[\"_field\"] == \"phosphorus\")";
 
             var fluxTables = await _influxDBClient.GetQueryApi().QueryAsync(flux, _org);
@@ -178,7 +178,7 @@ namespace Agri_Smart.Controllers
             string flux = $"from(bucket: \"{_bucket}\") " +
                 $"|> range(start: {timeRangeStart}, stop: {timeRangeStop}) " +
                 $"|> filter(fn: (r) => r[\"_measurement\"] == \"treesandrays_data\") " +
-                $"|> filter(fn: (r) => r[\"tenant_id\"] == {tenantId}) "; 
+                $"|> filter(fn: (r) => r[\"tenant_id\"] == \"{tenantId}\") "; 
                 //$"|> filter(fn: (r) => r[\"_field\"] == \"humidity_percentage\" or r[\"_field\"] == \"moisture\" or r[\"_field\"] == \"moisture_percentage\" or r[\"_field\"] == \"nitrogen\" or r[\"_field\"] == \"phosphorus\")";
 
             var fluxTables = await _influxDBClient.GetQueryApi().QueryAsync(flux, _org);
