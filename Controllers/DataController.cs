@@ -37,7 +37,7 @@ namespace Agri_Smart.Controllers
         }
 
         [HttpGet]
-        [Route("GetSensorData/{timeRangeStart}/{timeRangeStop}")]
+        [Route("GetSensorData/{tenantId}/{timeRangeStart}/{timeRangeStop}")]
         public async Task<IActionResult> GetSensorData(string tenantId, string timeRangeStart,string timeRangeStop)
         {
 
@@ -167,7 +167,7 @@ namespace Agri_Smart.Controllers
 
 
         [HttpGet]
-        [Route("GetSensorLatestData")]
+        [Route("GetSensorLatestData/{tenantId}")]
         public async Task<IActionResult> GetSensorLatestData(string tenantId)
         {
             var mobileNumber = User?.Claims?.FirstOrDefault(c => c.Type == "MobileNumber")?.Value;
