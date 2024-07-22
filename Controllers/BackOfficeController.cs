@@ -18,9 +18,10 @@ namespace Agri_Smart.Controllers
         }
 
         [HttpPost]
-        [Route("MapDevice")]
-        public async Task<IActionResult> MapDevice([FromBody] Devices request)
+        [Route("RegisterUspDevice")]
+        public async Task<IActionResult> RegisterUspDevice([FromBody] Devices request)
         {
+            request.TenantId = Guid.NewGuid().ToString();
             await _dbcontext.Devices.AddAsync(request);
             _dbcontext.SaveChanges();
 

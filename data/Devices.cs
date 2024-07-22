@@ -6,7 +6,9 @@ namespace Agri_Smart.data
     {
         [Key]
         public Guid Id { get; set; }
+        public Guid? UserId { get; set; }
         public string? PhoneNumber { get; set; }
+        public string? MacId { get; set; }
         public string? TenantId { get; set; }
     }
 }
