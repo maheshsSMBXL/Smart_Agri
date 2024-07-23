@@ -1,8 +1,10 @@
 ﻿using Agri_Smart.data;
+using Agri_Smart.Models;
 using InfluxDB.Client;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace Agri_Smart.Controllers
 {
@@ -19,13 +21,33 @@ namespace Agri_Smart.Controllers
 
         [HttpPost]
         [Route("RegisterUspDevice")]
-        public async Task<IActionResult> RegisterUspDevice([FromBody] Devices request)
+        public async Task<IActionResult> RegisterUspDevice([FromBody] RegisterDeviceInput request)
         {
-            request.TenantId = Guid.NewGuid().ToString();
-            await _dbcontext.Devices.AddAsync(request);
-            _dbcontext.SaveChanges();
+            if (request.OldMacId == null)
+            {
+                var tenantId = Guid.NewGuid().ToString();
+                var device = new Devices();
+                device.PhoneNumber = request.PhoneNumber;
+                device.MacId = request.NewMacId;
+                device.TenantId = tenantId;
+                await _dbcontext.Devices.AddAsync(device);
+                _dbcontext.SaveChanges();
 
-            return Ok(new { Status = "Success", Message = "Device mapped with user successfully."});
+                return Ok(new { Status = "Success", Message = "Device mapped with user successfully." });
+            }
+            else
+            {
+                var device = await _dbcontext.Devices.FirstOrDefaultAsync(a => a.MacId == request.OldMacId && a.PhoneNumber == request.PhoneNumber);
+                if (device != null) 
+                {
+                    device.MacId = request.NewMacId;
+                    _dbcontext.SaveChanges();
+
+                    return Ok(new { Status = "Success", Message = "Old device replaced with new device successfully." });
+                }
+            }
+            return Ok(new { Status = "Failed"});
+
         }
 
     }
