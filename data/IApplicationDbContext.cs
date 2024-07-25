@@ -10,6 +10,7 @@ namespace Agri_Smart.data
         DbSet<UserInfo> UserInfo { get; set; }
         DbSet<Diseases> Diseases { get; set; }
         DbSet<Devices> Devices { get; set; }
+        DbSet<DeviceUnstableData> DeviceUnstableData { get; set; }
 
         int SaveChanges();
         DataTable ExecuteReader

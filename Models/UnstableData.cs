@@ -2,18 +2,18 @@
 {
     public class UnstableData
     {
-        public string? TenantId { get; set; }
-        public UnstableDataModel? Data { get; set; }
+        public string? tenant_id { get; set; }
+        public UnstableDataModel? unstable_data { get; set; }
     }
     public class UnstableDataModel
     {
-        public double? SoilMoistureP { get; set; }
-        public double? SoilMoistureF { get; set; }
-        public double? TemperatureC { get; set; }
-        public double? TemperatureF { get; set; }
-        public double? Humidity { get; set; }
-        public double? Nitrogen { get; set; }
-        public double? Potassium { get; set; }
-        public double? Phosphorus { get; set; }
+        public double? soil_moisture_p { get; set; }
+        public double? soil_moisture_f { get; set; }
+        public double? temperature_c { get; set; }
+        public double? temperature_f { get; set; }
+        public double? humidity { get; set; }
+        public double? nitrogen { get; set; }
+        public double? potassium { get; set; }
+        public double? phosphorus { get; set; }
     }
 }

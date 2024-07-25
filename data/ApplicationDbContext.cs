@@ -19,6 +19,7 @@ namespace Agri_Smart.data
         public DbSet<UserInfo> UserInfo { get; set; }
         public DbSet<Diseases> Diseases { get; set; }
         public DbSet<Devices> Devices { get; set; }
+        public DbSet<DeviceUnstableData> DeviceUnstableData { get; set; }
 
         public override int SaveChanges()
         {

@@ -146,20 +146,43 @@ namespace Agri_Smart.Controllers
                     // Create a point for each data item
                     var point = PointData
                         .Measurement("unstable_data_new")
-                        .Tag("tenant_id", sensorData.TenantId)
-                        .Field("soil_moisture_p", sensorData.Data.SoilMoistureP.HasValue ? sensorData.Data.SoilMoistureP.Value : double.NaN)
-                        .Field("soil_moisture_f", sensorData.Data.SoilMoistureF.HasValue ? sensorData.Data.SoilMoistureF.Value : double.NaN)
-                        .Field("temperature_c", sensorData.Data.TemperatureC.HasValue ? sensorData.Data.TemperatureC.Value : double.NaN)
-                        .Field("temperature_f", sensorData.Data.TemperatureF.HasValue ? sensorData.Data.TemperatureF.Value : double.NaN)
-                        .Field("humidity", sensorData.Data.Humidity.HasValue ? sensorData.Data.Humidity.Value : double.NaN)
-                        .Field("nitrogen", sensorData.Data.Nitrogen.HasValue ? sensorData.Data.Nitrogen.Value : double.NaN)
-                        .Field("potassium", sensorData.Data.Potassium.HasValue ? sensorData.Data.Potassium.Value : double.NaN)
-                        .Field("phosphorus", sensorData.Data.Phosphorus.HasValue ? sensorData.Data.Phosphorus.Value : double.NaN)
+                        .Tag("tenant_id", sensorData.tenant_id)
+                        .Field("soil_moisture_p", sensorData.unstable_data.soil_moisture_p.HasValue ? sensorData.unstable_data.soil_moisture_p.Value : double.NaN)
+                        .Field("soil_moisture_f", sensorData.unstable_data.soil_moisture_f.HasValue ? sensorData.unstable_data.soil_moisture_f.Value : double.NaN)
+                        .Field("temperature_c", sensorData.unstable_data.temperature_c.HasValue ? sensorData.unstable_data.temperature_c.Value : double.NaN)
+                        .Field("temperature_f", sensorData.unstable_data.temperature_f.HasValue ? sensorData.unstable_data.temperature_f.Value : double.NaN)
+                        .Field("humidity", sensorData.unstable_data.humidity.HasValue ? sensorData.unstable_data.humidity.Value : double.NaN)
+                        .Field("nitrogen", sensorData.unstable_data.nitrogen.HasValue ? sensorData.unstable_data.nitrogen.Value : double.NaN)
+                        .Field("potassium", sensorData.unstable_data.potassium.HasValue ? sensorData.unstable_data.potassium.Value : double.NaN)
+                        .Field("phosphorus", sensorData.unstable_data.phosphorus.HasValue ? sensorData.unstable_data.phosphorus.Value : double.NaN)
                         .Timestamp(DateTime.UtcNow, WritePrecision.Ns);
 
                     // Write the point to InfluxDB
                     writeApi.WritePoint(point, _bucket, _org);
                 }
+            }
+
+            return Ok(new { message = "Data inserted successfully." });
+        }
+        [AllowAnonymous]
+        [HttpPost]
+        [Route("SaveDeviceUnstableData")]
+        public async Task<IActionResult> SaveDeviceUnstableData([FromBody] List<UnstableData> deviceDataList)
+        {
+            foreach (var deviceData in deviceDataList)
+            {
+                var deviceUnstableData = new DeviceUnstableData();
+                deviceUnstableData.MacId = deviceData?.tenant_id;
+                deviceUnstableData.SoilMoistureP = deviceData?.unstable_data?.soil_moisture_p;
+                deviceUnstableData.SoilMoistureF = deviceData?.unstable_data?.soil_moisture_f;
+                deviceUnstableData.TemperatureC = deviceData?.unstable_data?.temperature_c;
+                deviceUnstableData.TemperatureF = deviceData?.unstable_data?.temperature_f;
+                deviceUnstableData.Humidity = deviceData?.unstable_data?.humidity;
+                deviceUnstableData.Nitrogen = deviceData?.unstable_data?.nitrogen;
+                deviceUnstableData.Potassium = deviceData?.unstable_data?.potassium;
+                deviceUnstableData.Phosphorus = deviceData?.unstable_data?.phosphorus;
+                await _dbcontext.DeviceUnstableData.AddAsync(deviceUnstableData);
+                _dbcontext.SaveChanges();
             }
 
             return Ok(new { message = "Data inserted successfully." });
