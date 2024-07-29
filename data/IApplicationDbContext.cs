@@ -12,6 +12,12 @@ namespace Agri_Smart.data
         DbSet<Devices> Devices { get; set; }
         DbSet<DeviceUnstableData> DeviceUnstableData { get; set; }
 
+        DbSet<Category> Category { get; set; }
+        DbSet<Workers> Workers { get; set; }
+        DbSet<Machinery> Machineries { get; set; }
+        DbSet<OtherExpenses> OtherExpenses { get; set; }
+        DbSet<CategorySubExpenses> CategorySubExpenses { get; set; }
+
         int SaveChanges();
         DataTable ExecuteReader
         (

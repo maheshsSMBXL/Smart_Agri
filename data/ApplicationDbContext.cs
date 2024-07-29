@@ -21,6 +21,12 @@ namespace Agri_Smart.data
         public DbSet<Devices> Devices { get; set; }
         public DbSet<DeviceUnstableData> DeviceUnstableData { get; set; }
 
+        public DbSet<Category> Category { get; set; }
+        public DbSet<Workers> Workers { get; set; }
+        public DbSet<Machinery> Machineries { get; set; }
+        public DbSet<OtherExpenses> OtherExpenses { get; set; }
+        public DbSet<CategorySubExpenses> CategorySubExpenses { get; set; }
+
         public override int SaveChanges()
         {
             return base.SaveChanges();
