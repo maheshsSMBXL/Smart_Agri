@@ -8,7 +8,7 @@ namespace Agri_Smart.Models
         public string? CategoryName { get; set; }
         public string? CategoryDate { get; set; }
         public DateTime? EstimatedHarvestDate { get; set; }
-        public TimeSpan? IrrigationDuration { get; set; }
+        public IrrigationDuration? IrrigationDuration { get; set; }
         public string? Observations { get; set; }
         public string? Attachments { get; set; }
         public double? FuelCost { get; set; }        
@@ -19,6 +19,12 @@ namespace Agri_Smart.Models
         public string? TotalCost { get; set; }
 
     }
+    public class IrrigationDuration 
+    {
+        public int? Hours { get; set; }
+        public int? Minutes { get; set; }
+        public int? Seconds { get; set; }
+    }
     public class WorkersExpenses 
     {
         public int? NoOfWorkers { get; set; }
@@ -27,14 +33,14 @@ namespace Agri_Smart.Models
     }
     public class MachineryExpenses
     {
-        public int? NoOfWorkers { get; set; }
-        public double? CostPerWorker { get; set; }
+        public int? NoOfMachines { get; set; }
+        public double? CostPerMachine { get; set; }
         public double? TotalCost { get; set; }
     }
     public class OtherExpensesInput
     {
-        public int? NoOfWorkers { get; set; }
-        public double? CostPerWorker { get; set; }
+        public string? Expense { get; set; }
+        public double? Cost { get; set; }
         public double? TotalCost { get; set; }
     }
     public class CategorySubExpensesInput

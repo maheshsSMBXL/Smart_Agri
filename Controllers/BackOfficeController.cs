@@ -49,6 +49,24 @@ namespace Agri_Smart.Controllers
             return Ok(new { Status = "Failed"});
 
         }
+        [HttpPost]
+        [Route("SaveCategory")]
+        public async Task<IActionResult> SaveCategory([FromBody] List<Category> request)
+        {
+            foreach (var req in request)
+            {
+                var category = new Category();
+
+                category.CategoryId = Guid.NewGuid();
+                category.CategoryName = req.CategoryName;
+                category.Icon = req.Icon;
+                
+                await _dbcontext.Category.AddAsync(category);
+                _dbcontext.SaveChanges();
+            }
+
+            return Ok(new { message = "Data inserted successfully." });            
+        }
 
     }
 }

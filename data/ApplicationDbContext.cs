@@ -22,6 +22,7 @@ namespace Agri_Smart.data
         public DbSet<DeviceUnstableData> DeviceUnstableData { get; set; }
 
         public DbSet<Category> Category { get; set; }
+        public DbSet<Expenses> Expenses { get; set; }
         public DbSet<Workers> Workers { get; set; }
         public DbSet<Machinery> Machineries { get; set; }
         public DbSet<OtherExpenses> OtherExpenses { get; set; }
