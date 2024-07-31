@@ -137,12 +137,12 @@ namespace Agri_Smart.Controllers
             if (request != null)
             {
                 var expenses = await _dbcontext.Expenses
-                    .FirstOrDefaultAsync(e => e.CategoryId == request.CategoryId && e.ActivityId == activityId);
+                    .FirstOrDefaultAsync(e => e.CategoryId == request.CategoryId && e.ActivityId == request.ActivityId);
 
                 if (expenses == null)
                 {
                     expenses = new Expenses();
-                    expenses.ActivityId = activityId;
+                    expenses.ActivityId = request.ActivityId != null ? request.ActivityId : activityId;
                     expenses.CreatedDate = activityCretedDate;
                     expenses.UserID = UserInfo?.Id;
                     expenses.CreatedBy = UserInfo?.Id;
@@ -159,7 +159,7 @@ namespace Agri_Smart.Controllers
                 if (request?.CategorySubExpenses != null)
                 {
                     var existingSubExpenses = await _dbcontext.CategorySubExpenses
-                        .Where(cse => cse.CategoryId == request.CategoryId && cse.ActivityId == activityId)
+                        .Where(cse => cse.CategoryId == request.CategoryId && cse.ActivityId == request.ActivityId)
                         .ToListAsync();
 
                     _dbcontext.CategorySubExpenses.RemoveRange(existingSubExpenses);
@@ -168,7 +168,7 @@ namespace Agri_Smart.Controllers
                     {
                         var categorySubExpenses = new CategorySubExpenses();
                         categorySubExpenses.CategoryId = request.CategoryId;
-                        categorySubExpenses.ActivityId = activityId;
+                        categorySubExpenses.ActivityId = request.ActivityId != null ? request.ActivityId : activityId;
                         categorySubExpenses.IrrigationDuration = request.IrrigationDuration != null
                             ? new TimeSpan((int)(request?.IrrigationDuration?.Hours), (int)(request?.IrrigationDuration?.Minutes), (int)(request?.IrrigationDuration?.Seconds))
                             : null;
@@ -186,7 +186,7 @@ namespace Agri_Smart.Controllers
                 if (request?.Workers != null)
                 {
                     var existingWorkers = await _dbcontext.Workers
-                        .Where(w => w.CategoryId == request.CategoryId && w.ActivityId == activityId)
+                        .Where(w => w.CategoryId == request.CategoryId && w.ActivityId == request.ActivityId)
                         .ToListAsync();
 
                     _dbcontext.Workers.RemoveRange(existingWorkers);
@@ -195,7 +195,7 @@ namespace Agri_Smart.Controllers
                     {
                         var worker = new Workers();
                         worker.CategoryId = request.CategoryId;
-                        worker.ActivityId = activityId;
+                        worker.ActivityId = request.ActivityId != null ? request.ActivityId : activityId;
                         worker.NoOfWorkers = workerExpense.NoOfWorkers;
                         worker.CostPerWorker = workerExpense.CostPerWorker;
                         worker.TotalCost = workerExpense.TotalCost;
@@ -207,7 +207,7 @@ namespace Agri_Smart.Controllers
                 if (request?.Machinery != null)
                 {
                     var existingMachinery = await _dbcontext.Machineries
-                        .Where(m => m.CategoryId == request.CategoryId && m.ActivityId == activityId)
+                        .Where(m => m.CategoryId == request.CategoryId && m.ActivityId == request.ActivityId)
                         .ToListAsync();
 
                     _dbcontext.Machineries.RemoveRange(existingMachinery);
@@ -216,7 +216,7 @@ namespace Agri_Smart.Controllers
                     {
                         var machinery = new Machinery();
                         machinery.CategoryId = request.CategoryId;
-                        machinery.ActivityId = activityId;
+                        machinery.ActivityId = request.ActivityId != null ? request.ActivityId : activityId;
                         machinery.NoOfMachines = machineryExpense.NoOfMachines;
                         machinery.CostPerMachine = machineryExpense.CostPerMachine;
                         machinery.TotalCost = machineryExpense.TotalCost;
@@ -228,7 +228,7 @@ namespace Agri_Smart.Controllers
                 if (request?.OtherExpenses != null)
                 {
                     var existingOtherExpenses = await _dbcontext.OtherExpenses
-                        .Where(oe => oe.CategoryId == request.CategoryId && oe.ActivityId == activityId)
+                        .Where(oe => oe.CategoryId == request.CategoryId && oe.ActivityId == request.ActivityId)
                         .ToListAsync();
 
                     _dbcontext.OtherExpenses.RemoveRange(existingOtherExpenses);
@@ -237,7 +237,7 @@ namespace Agri_Smart.Controllers
                     {
                         var otherExpenses = new OtherExpenses();
                         otherExpenses.CategoryId = request.CategoryId;
-                        otherExpenses.ActivityId = activityId;
+                        otherExpenses.ActivityId = request.ActivityId != null ? request.ActivityId : activityId;
                         otherExpenses.Expense = otherExpense.Expense;
                         otherExpenses.Cost = otherExpense.Cost;
                         otherExpenses.TotalCost = otherExpense.TotalCost;

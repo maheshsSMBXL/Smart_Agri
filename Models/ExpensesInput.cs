@@ -6,6 +6,7 @@ namespace Agri_Smart.Models
     {
         public Guid CategoryId { get; set; }
         public string? CategoryName { get; set; }
+        public Guid ActivityId { get; set; }
         public string? CategoryDate { get; set; }
         public DateTime? EstimatedHarvestDate { get; set; }
         public IrrigationDuration? IrrigationDuration { get; set; }
