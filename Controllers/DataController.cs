@@ -247,18 +247,36 @@ namespace Agri_Smart.Controllers
 
             var result = new
             {
-                TemperatureCelsius = latestValues.ContainsKey("temperature_celsius") ? latestValues["temperature_celsius"]["_value"] : null,
-                TemperatureFahrenheit = latestValues.ContainsKey("temperature_fahrenheit") ? latestValues["temperature_fahrenheit"]["_value"] : null,
-                HumidityPercentage = latestValues.ContainsKey("humidity_percentage") ? latestValues["humidity_percentage"]["_value"] : null,
-                Moisture = latestValues.ContainsKey("moisture") ? latestValues["moisture"]["_value"] : null,
-                MoisturePercentage = latestValues.ContainsKey("moisture_percentage") ? latestValues["moisture_percentage"]["_value"] : null,
-                Nitrogen = latestValues.ContainsKey("nitrogen") ? latestValues["nitrogen"]["_value"] : null,
-                Phosphorus = latestValues.ContainsKey("phosphorus") ? latestValues["phosphorus"]["_value"] : null,
-                Potassium = latestValues.ContainsKey("potassium") ? latestValues["potassium"]["_value"] : null
+                TemperatureCelsius = latestValues.ContainsKey("temperature_celsius") ? FormatDouble(latestValues["temperature_celsius"]["_value"]) : null,
+                TemperatureFahrenheit = latestValues.ContainsKey("temperature_fahrenheit") ? FormatDouble(latestValues["temperature_fahrenheit"]["_value"]) : null,
+                HumidityPercentage = latestValues.ContainsKey("humidity_percentage") ? FormatDouble(latestValues["humidity_percentage"]["_value"]) : null,
+                Moisture = latestValues.ContainsKey("moisture") ? FormatDouble(latestValues["moisture"]["_value"]) : null,
+                MoisturePercentage = latestValues.ContainsKey("moisture_percentage") ? FormatDouble(latestValues["moisture_percentage"]["_value"]) : null,
+                Nitrogen = latestValues.ContainsKey("nitrogen") ? FormatDouble(latestValues["nitrogen"]["_value"]) : null,
+                Phosphorus = latestValues.ContainsKey("phosphorus") ? FormatDouble(latestValues["phosphorus"]["_value"]) : null,
+                Potassium = latestValues.ContainsKey("potassium") ? FormatDouble(latestValues["potassium"]["_value"]) : null
             };
 
             return Ok(result);
         }
+        private string FormatDouble(object value)
+        {
+            double result;
+            if (value is double)
+            {
+                result = (double)value;
+            }
+            else if (double.TryParse(value.ToString(), out result))
+            {
+                // No further action needed, as 'result' has already been assigned
+            }
+            else
+            {
+                return value?.ToString();
+            }
+            return result.ToString("F1");
+        }
+
         [HttpGet]
         [Route("GetSensorData1/{tenantId}")]
         public async Task<IActionResult> GetSensorData1(string tenantId)
