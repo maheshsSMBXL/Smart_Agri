@@ -70,9 +70,9 @@ namespace Agri_Smart.Controllers
                         categorySubExpenses.Name = categorySubExpense.Name;
                         categorySubExpenses.Quantity = categorySubExpense.Quantity;
                         categorySubExpenses.Units = categorySubExpense.Units;
-                        categorySubExpenses.Cost = categorySubExpenses.Cost;
-                        categorySubExpenses.Observations = categorySubExpenses.Observations;
-                        categorySubExpenses.Attachments = categorySubExpenses.Attachments;
+                        categorySubExpenses.Cost = categorySubExpense.Cost;
+                        categorySubExpenses.Observations = request.Observations;
+                        categorySubExpenses.Attachments = request.Attachments;
                         categorySubExpenses.CreatedDate = activityCretedDate;
                         await _dbcontext.CategorySubExpenses.AddAsync(categorySubExpenses);
                     }
@@ -125,6 +125,133 @@ namespace Agri_Smart.Controllers
 
             return Ok(null);
         }
+        [HttpPost]
+        [Route("SaveExpensesNew")]
+        public async Task<IActionResult> SaveExpensesNew([FromBody] ExpensesInput request)
+        {
+            var mobileNumber = User?.Claims?.FirstOrDefault(c => c.Type == "MobileNumber")?.Value;
+            var UserInfo = await _dbcontext.UserInfo.FirstOrDefaultAsync(a => a.PhoneNumber == mobileNumber);
+            var activityId = Guid.NewGuid();
+            var activityCretedDate = new DateTime();
+
+            if (request != null)
+            {
+                var expenses = await _dbcontext.Expenses
+                    .FirstOrDefaultAsync(e => e.CategoryId == request.CategoryId && e.ActivityId == activityId);
+
+                if (expenses == null)
+                {
+                    expenses = new Expenses();
+                    expenses.ActivityId = activityId;
+                    expenses.CreatedDate = activityCretedDate;
+                    expenses.UserID = UserInfo?.Id;
+                    expenses.CreatedBy = UserInfo?.Id;
+                    await _dbcontext.Expenses.AddAsync(expenses);
+                }
+
+                expenses.CategoryId = request.CategoryId;
+                expenses.CategoryName = request?.CategoryName;
+                expenses.CategoryDate = request?.CategoryDate;
+                expenses.EstimatedHarvestDate = request?.EstimatedHarvestDate;
+                expenses.FuelCost = request?.FuelCost;
+                expenses.TotalCost = request?.TotalCost;
+
+                if (request?.CategorySubExpenses != null)
+                {
+                    var existingSubExpenses = await _dbcontext.CategorySubExpenses
+                        .Where(cse => cse.CategoryId == request.CategoryId && cse.ActivityId == activityId)
+                        .ToListAsync();
+
+                    _dbcontext.CategorySubExpenses.RemoveRange(existingSubExpenses);
+
+                    foreach (var categorySubExpense in request.CategorySubExpenses)
+                    {
+                        var categorySubExpenses = new CategorySubExpenses();
+                        categorySubExpenses.CategoryId = request.CategoryId;
+                        categorySubExpenses.ActivityId = activityId;
+                        categorySubExpenses.IrrigationDuration = request.IrrigationDuration != null
+                            ? new TimeSpan((int)(request?.IrrigationDuration?.Hours), (int)(request?.IrrigationDuration?.Minutes), (int)(request?.IrrigationDuration?.Seconds))
+                            : null;
+                        categorySubExpenses.Name = categorySubExpense.Name;
+                        categorySubExpenses.Quantity = categorySubExpense.Quantity;
+                        categorySubExpenses.Units = categorySubExpense.Units;
+                        categorySubExpenses.Cost = categorySubExpense.Cost;
+                        categorySubExpenses.Observations = request.Observations;
+                        categorySubExpenses.Attachments = request.Attachments;
+                        categorySubExpenses.CreatedDate = activityCretedDate;
+                        await _dbcontext.CategorySubExpenses.AddAsync(categorySubExpenses);
+                    }
+                }
+
+                if (request?.Workers != null)
+                {
+                    var existingWorkers = await _dbcontext.Workers
+                        .Where(w => w.CategoryId == request.CategoryId && w.ActivityId == activityId)
+                        .ToListAsync();
+
+                    _dbcontext.Workers.RemoveRange(existingWorkers);
+
+                    foreach (var workerExpense in request.Workers)
+                    {
+                        var worker = new Workers();
+                        worker.CategoryId = request.CategoryId;
+                        worker.ActivityId = activityId;
+                        worker.NoOfWorkers = workerExpense.NoOfWorkers;
+                        worker.CostPerWorker = workerExpense.CostPerWorker;
+                        worker.TotalCost = workerExpense.TotalCost;
+                        worker.CreatedDate = activityCretedDate;
+                        await _dbcontext.Workers.AddAsync(worker);
+                    }
+                }
+
+                if (request?.Machinery != null)
+                {
+                    var existingMachinery = await _dbcontext.Machineries
+                        .Where(m => m.CategoryId == request.CategoryId && m.ActivityId == activityId)
+                        .ToListAsync();
+
+                    _dbcontext.Machineries.RemoveRange(existingMachinery);
+
+                    foreach (var machineryExpense in request.Machinery)
+                    {
+                        var machinery = new Machinery();
+                        machinery.CategoryId = request.CategoryId;
+                        machinery.ActivityId = activityId;
+                        machinery.NoOfMachines = machineryExpense.NoOfMachines;
+                        machinery.CostPerMachine = machineryExpense.CostPerMachine;
+                        machinery.TotalCost = machineryExpense.TotalCost;
+                        machinery.CreatedDate = activityCretedDate;
+                        await _dbcontext.Machineries.AddAsync(machinery);
+                    }
+                }
+
+                if (request?.OtherExpenses != null)
+                {
+                    var existingOtherExpenses = await _dbcontext.OtherExpenses
+                        .Where(oe => oe.CategoryId == request.CategoryId && oe.ActivityId == activityId)
+                        .ToListAsync();
+
+                    _dbcontext.OtherExpenses.RemoveRange(existingOtherExpenses);
+
+                    foreach (var otherExpense in request.OtherExpenses)
+                    {
+                        var otherExpenses = new OtherExpenses();
+                        otherExpenses.CategoryId = request.CategoryId;
+                        otherExpenses.ActivityId = activityId;
+                        otherExpenses.Expense = otherExpense.Expense;
+                        otherExpenses.Cost = otherExpense.Cost;
+                        otherExpenses.TotalCost = otherExpense.TotalCost;
+                        otherExpenses.CreatedDate = activityCretedDate;
+                        await _dbcontext.OtherExpenses.AddAsync(otherExpenses);
+                    }
+                }
+            }
+
+            _dbcontext.SaveChanges();
+
+            return Ok(null);
+        }
+
         [HttpGet]
         [Route("GetExpenses/{categoryId}")]
         public async Task<IActionResult> GetExpenses(Guid categoryId)
