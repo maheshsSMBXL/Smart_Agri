@@ -43,13 +43,14 @@ namespace Agri_Smart.Controllers
 
             var mobileNumber = User?.Claims?.FirstOrDefault(c => c.Type == "MobileNumber")?.Value;
             var UserInfo = await _dbcontext.UserInfo.FirstOrDefaultAsync(a => a.PhoneNumber == mobileNumber);
+            var macId = await _dbcontext.Devices.Where(a => a.TenantId == tenantId).Select(a => a.MacId).FirstOrDefaultAsync();
 
             //var timeRangeStart = "2024-01-01T06:02:00.000Z";
             //var timeRangeStop = "2090-07-01T06:02:00.000Z";
             string flux = $"from(bucket: \"{_bucket}\") " +
                 $"|> range(start: {timeRangeStart}, stop: {timeRangeStop}) " +
                 $"|> filter(fn: (r) => r[\"_measurement\"] == \"treesandrays_data\") " +
-                $"|> filter(fn: (r) => r[\"tenant_id\"] == \"{tenantId}\") ";
+                $"|> filter(fn: (r) => r[\"tenant_id\"] == \"{macId}\") ";
                 //$"|> filter(fn: (r) => r[\"_field\"] == \"humidity_percentage\" or r[\"_field\"] == \"moisture\" or r[\"_field\"] == \"moisture_percentage\" or r[\"_field\"] == \"nitrogen\" or r[\"_field\"] == \"phosphorus\")";
 
             var fluxTables = await _influxDBClient.GetQueryApi().QueryAsync(flux, _org);
@@ -126,7 +127,7 @@ namespace Agri_Smart.Controllers
 
             return Ok(result);
 
-        }
+        }    
         [AllowAnonymous]
         [HttpPost]
         [Route("InsertUnstableData")]
@@ -257,6 +258,86 @@ namespace Agri_Smart.Controllers
             };
 
             return Ok(result);
+        }
+        [HttpGet]
+        [Route("GetSensorData1/{tenantId}")]
+        public async Task<IActionResult> GetSensorData1(string tenantId)
+        {
+            var mobileNumber = User?.Claims?.FirstOrDefault(c => c.Type == "MobileNumber")?.Value;
+            var macId = await _dbcontext.Devices.Where(a => a.TenantId == tenantId).Select(a => a.MacId).FirstOrDefaultAsync();
+            //var UserInfo = await _dbcontext.UserInfo.FirstOrDefaultAsync(a => a.PhoneNumber == mobileNumber);
+
+            var timeRangeStart = "2024-07-21T06:02:00.000Z";
+            var timeRangeStop = "2024-07-23T06:02:00.000Z";
+            string flux = $"from(bucket: \"{_bucket}\") " +
+                $"|> range(start: {timeRangeStart}, stop: {timeRangeStop}) " +
+                $"|> filter(fn: (r) => r[\"_measurement\"] == \"treesandrays_data\") " +
+                $"|> filter(fn: (r) => r[\"tenant_id\"] == \"{macId}\")";
+
+            var fluxTables = await _influxDBClient.GetQueryApi().QueryAsync(flux, _org);
+
+            var allRecords = new List<Dictionary<string, object>>();
+
+            var Result = new List<Dictionary<string, object>>();
+
+            foreach (FluxTable table in fluxTables)
+            {
+                foreach (FluxRecord record in table.Records)
+                {
+                    var field = record.Values["_field"].ToString();
+                    var recordValues = new Dictionary<string, object>
+                    {
+                        { "_start", record.Values.ContainsKey("_start") ? record.Values["_start"].ToString() : null },
+                        { "_stop", record.Values.ContainsKey("_stop") ? record.Values["_stop"].ToString() : null },
+                        { "_time", record.Values.ContainsKey("_time") ? record.Values["_time"].ToString() : null },
+                        { "_value", record.Values["_value"] },
+                        { "_field", record.Values["_field"] },
+                        { "_measurement", record.Values["_measurement"] },
+                        { "tenant_id", record.Values["tenant_id"] }
+                    };
+                    allRecords.Add(recordValues);
+
+                    var resultValues = new Dictionary<string, object>
+                    {
+                        { "tenantId", record.Values["tenant_id"] },
+                        { "field", record.Values["_field"] },
+                        { "value", record.Values["_value"] }                        
+                    };
+                    Result.Add(resultValues);
+
+                    //var deviceUnstableData = new DeviceUnstableData();
+                    //switch (field)
+                    //{
+                    //    case "temperature_celsius":
+                    //        deviceUnstableData.TemperatureC = (double?)record.Values["_value"];
+                    //        break;
+                    //    case "temperature_fahrenheit":
+                    //        deviceUnstableData.TemperatureF = (double?)record.Values["_value"];
+                    //        break;
+                    //    case "humidity_percentage":
+                    //        deviceUnstableData.Humidity = (double?)record.Values["_value"];
+                    //        break;
+                    //    case "moisture":
+                    //        deviceUnstableData.SoilMoistureP = (double?)record.Values["_value"];
+                    //        break;
+                    //    case "moisture_percentage":
+                    //        deviceUnstableData.SoilMoistureF = (double?)record.Values["_value"];
+                    //        break;
+                    //    case "nitrogen":
+                    //        deviceUnstableData.Nitrogen = (double?)record.Values["_value"];
+                    //        break;
+                    //    case "phosphorus":
+                    //        deviceUnstableData.Phosphorus = (double?)record.Values["_value"];
+                    //        break;
+                    //    case "potassium":
+                    //        deviceUnstableData.Potassium = (double?)record.Values["_value"];
+                    //        break;
+                    //}
+                    //Result.Add(deviceUnstableData);
+                }
+            }
+
+            return Ok(Result.ToList());
         }
 
         [HttpPost]
