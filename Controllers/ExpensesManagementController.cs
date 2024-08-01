@@ -268,6 +268,11 @@ namespace Agri_Smart.Controllers
                 .Where(e => e.UserID == userInfo.Id && e.CategoryId == categoryId)
                 .ToListAsync();
 
+            if (expenses == null)
+            {
+                return NotFound("You do not have any expenses");
+            }
+
             var categorySubExpenses = await _dbcontext.CategorySubExpenses
                 .Where(cse => cse.CategoryId == categoryId && cse.ActivityId == expenses.FirstOrDefault().ActivityId)
                 .ToListAsync();
