@@ -151,7 +151,7 @@ namespace Agri_Smart.Controllers
             _dbcontext.SaveChanges();
 
 
-            return Ok(null);
+            return Ok("Data Saved Successfully.");
         }
         [HttpPost]
         [Route("SaveExpensesNew")]
@@ -281,7 +281,7 @@ namespace Agri_Smart.Controllers
 
             _dbcontext.SaveChanges();
 
-            return Ok(null);
+            return Ok("Data Saved Successfully.");
         }
 
         [HttpGet]
