@@ -290,95 +290,39 @@ namespace Agri_Smart.Controllers
         {
             var mobileNumber = User?.Claims?.FirstOrDefault(c => c.Type == "MobileNumber")?.Value;
             var userInfo = await _dbcontext.UserInfo.FirstOrDefaultAsync(a => a.PhoneNumber == mobileNumber);
-            
-            if (userInfo == null)
-            {
-                return NotFound("User not found");
-            }
-
+                      
             var expenses = await _dbcontext.Expenses
                 .Where(e => e.UserID == userInfo.Id)
                 .ToListAsync();
-
-            if (expenses == null)
+            var CustomerExpenses = new List<CustomerExpenses>();
+            foreach (var expense in expenses) 
             {
-                return NotFound("You do not have any expenses");
+                var CustomerExpense = new CustomerExpenses();
+
+                var categorySubExpenses = await _dbcontext.CategorySubExpenses
+                .Where(cse => cse.CategoryId == expense.CategoryId && cse.ActivityId == expense.ActivityId)
+                .ToListAsync();
+
+                var workers = await _dbcontext.Workers
+                    .Where(w => w.CategoryId == expense.CategoryId && w.ActivityId == expense.ActivityId)
+                    .ToListAsync();
+
+                var machineries = await _dbcontext.Machineries
+                    .Where(m => m.CategoryId == expense.CategoryId && m.ActivityId == expense.ActivityId)
+                    .ToListAsync();
+
+                var otherExpenses = await _dbcontext.OtherExpenses
+                    .Where(oe => oe.CategoryId == expense.CategoryId && oe.ActivityId == expense.ActivityId)
+                    .ToListAsync();
+
+                CustomerExpense.Expenses = expense;
+                CustomerExpense.Workers = workers;
+                CustomerExpense.Machinery = machineries;
+                CustomerExpense.OtherExpenses = otherExpenses;
+
+                CustomerExpenses.Add(CustomerExpense);
             }
-
-            var categorySubExpenses = await _dbcontext.CategorySubExpenses
-                .Where(cse => cse.CategoryId == expenses.FirstOrDefault().CategoryId && cse.ActivityId == expenses.FirstOrDefault().ActivityId)
-                .ToListAsync();
-
-            var workers = await _dbcontext.Workers
-                .Where(w => w.CategoryId == expenses.FirstOrDefault().CategoryId && w.ActivityId == expenses.FirstOrDefault().ActivityId)
-                .ToListAsync();
-
-            var machineries = await _dbcontext.Machineries
-                .Where(m => m.CategoryId == expenses.FirstOrDefault().CategoryId && m.ActivityId == expenses.FirstOrDefault().ActivityId)
-                .ToListAsync();
-
-            var otherExpenses = await _dbcontext.OtherExpenses
-                .Where(oe => oe.CategoryId == expenses.FirstOrDefault().CategoryId && oe.ActivityId == expenses.FirstOrDefault().ActivityId)
-                .ToListAsync();
-
-            var result = new
-            {
-                Expenses = expenses.Select(e => new
-                {
-                    e.CategoryId,
-                    e.ActivityId,
-                    e.CategoryName,
-                    e.CategoryDate,
-                    e.EstimatedHarvestDate,
-                    e.FuelCost,
-                    e.TotalCost,
-                    e.CreatedDate,
-                    e.UserID,
-                    e.CreatedBy
-                }),
-                CategorySubExpenses = categorySubExpenses.Select(cse => new
-                {
-                    cse.CategoryId,
-                    cse.ActivityId,
-                    cse.IrrigationDuration,
-                    cse.Name,
-                    cse.Quantity,
-                    cse.Units,
-                    cse.Cost,
-                    cse.Observations,
-                    cse.Attachments,
-                    cse.CreatedDate
-                }),
-                Workers = workers.Select(w => new
-                {
-                    w.CategoryId,
-                    w.ActivityId,
-                    w.NoOfWorkers,
-                    w.CostPerWorker,
-                    w.TotalCost,
-                    w.CreatedDate
-                }),
-                Machineries = machineries.Select(m => new
-                {
-                    m.CategoryId,
-                    m.ActivityId,
-                    m.NoOfMachines,
-                    m.CostPerMachine,
-                    m.TotalCost,
-                    m.CreatedDate
-                }),
-                OtherExpenses = otherExpenses.Select(oe => new
-                {
-                    oe.CategoryId,
-                    oe.ActivityId,
-                    oe.Expense,
-                    oe.Cost,
-                    oe.TotalCost,
-                    oe.CreatedDate
-                })
-            };
-
-            return Ok(result);
+            return Ok(CustomerExpenses);
         }
         [HttpGet]
         [Route("GetRevenueCategories")]
