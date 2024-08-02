@@ -18,5 +18,6 @@ namespace Agri_Smart.data
         public string? Observations { get; set; }
         public string? Attachments { get; set; }
         public DateTime? CreatedDate { get; set; }
+        public Guid? UserId { get; set; }
     }
 }

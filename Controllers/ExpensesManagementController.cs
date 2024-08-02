@@ -207,6 +207,7 @@ namespace Agri_Smart.Controllers
                         categorySubExpenses.Observations = request.Observations;
                         categorySubExpenses.Attachments = request.Attachments;
                         categorySubExpenses.CreatedDate = activityCretedDate;
+                        categorySubExpenses.UserId = UserInfo?.Id;
                         await _dbcontext.CategorySubExpenses.AddAsync(categorySubExpenses);
                     }
                 }
@@ -228,6 +229,7 @@ namespace Agri_Smart.Controllers
                         worker.CostPerWorker = workerExpense.CostPerWorker;
                         worker.TotalCost = workerExpense.TotalCost;
                         worker.CreatedDate = activityCretedDate;
+                        worker.UserId = UserInfo?.Id;
                         await _dbcontext.Workers.AddAsync(worker);
                     }
                 }
@@ -249,6 +251,7 @@ namespace Agri_Smart.Controllers
                         machinery.CostPerMachine = machineryExpense.CostPerMachine;
                         machinery.TotalCost = machineryExpense.TotalCost;
                         machinery.CreatedDate = activityCretedDate;
+                        machinery.UserId = UserInfo?.Id;
                         await _dbcontext.Machineries.AddAsync(machinery);
                     }
                 }
@@ -270,6 +273,7 @@ namespace Agri_Smart.Controllers
                         otherExpenses.Cost = otherExpense.Cost;
                         otherExpenses.TotalCost = otherExpense.TotalCost;
                         otherExpenses.CreatedDate = activityCretedDate;
+                        otherExpenses.UserId = UserInfo?.Id;
                         await _dbcontext.OtherExpenses.AddAsync(otherExpenses);
                     }
                 }
@@ -435,6 +439,38 @@ namespace Agri_Smart.Controllers
                 }).ToList();
 
             return Ok(groupedByActivity);
+        }
+        [HttpGet]
+        [Route("GetToatlRevenueAndExpenses")]
+        public async Task<IActionResult> GetToatlRevenueAndExpenses()
+        {
+            var mobileNumber = User?.Claims?.FirstOrDefault(c => c.Type == "MobileNumber")?.Value;
+            var UserInfo = await _dbcontext.UserInfo.FirstOrDefaultAsync(a => a.PhoneNumber == mobileNumber);
+
+            var totalRevenueAndExpenses = new TotalRevenueAndExpenses();
+
+            var Workers = await _dbcontext.Workers.Where(w => w.UserId == UserInfo.Id).SumAsync(w => w.TotalCost) ?? 0;
+            var Machinery = await _dbcontext.Machineries.Where(w => w.UserId == UserInfo.Id).SumAsync(w => w.TotalCost) ?? 0;
+            var OtherExpenses = await _dbcontext.OtherExpenses.Where(w => w.UserId == UserInfo.Id).SumAsync(w => w.TotalCost) ?? 0;
+
+            var RevenueDetails = await _dbcontext.CustomerRevenue
+                .Where(w => w.UserID == UserInfo.Id && w.RevenueCategoryName == "Revenue details")
+                .SumAsync(w => w.ActivityTotal) ?? 0;
+
+            var HarvestedAndSold = await _dbcontext.CustomerRevenue
+                .Where(w => w.UserID == UserInfo.Id && w.RevenueCategoryName == "Harvested and sold")
+                .SumAsync(w => w.ActivityTotal) ?? 0;
+
+            totalRevenueAndExpenses.TotalRevenue = (RevenueDetails + HarvestedAndSold);
+            totalRevenueAndExpenses.CategorisedRevenues.RevenueDetails = RevenueDetails;
+            totalRevenueAndExpenses.CategorisedRevenues.HarvestedAndSold = HarvestedAndSold;
+
+            totalRevenueAndExpenses.TotalExpenses = (decimal)(Workers + Machinery + Machinery);
+            totalRevenueAndExpenses.CategorisedExpenses.Workers = (decimal)Workers;
+            totalRevenueAndExpenses.CategorisedExpenses.Machinery = (decimal)Machinery;
+            totalRevenueAndExpenses.CategorisedExpenses.OtherExpenses = (decimal)Machinery;
+
+            return Ok(totalRevenueAndExpenses);
         }
     }
 }

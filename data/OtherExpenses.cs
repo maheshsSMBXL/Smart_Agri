@@ -14,5 +14,6 @@ namespace Agri_Smart.data
         public double? Cost { get; set; }
         public double? TotalCost { get; set; }
         public DateTime? CreatedDate { get; set; }
+        public Guid? UserId { get; set; }
     }
 }
