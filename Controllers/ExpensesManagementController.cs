@@ -412,10 +412,29 @@ namespace Agri_Smart.Controllers
                 customerRevenue.UserID = UserInfo.Id;
                 customerRevenue.CreatedBy = UserInfo.Id;
                 await _dbcontext.CustomerRevenue.AddAsync(customerRevenue);
-            }
-            _dbcontext.SaveChanges();
+                _dbcontext.SaveChanges();
+            }            
 
             return Ok("Data Inserted Successfully.");
+        }
+        [HttpGet]
+        [Route("GetCustomerRevenues")]
+        public async Task<IActionResult> GetCustomerRevenues()
+        {
+            var mobileNumber = User?.Claims?.FirstOrDefault(c => c.Type == "MobileNumber")?.Value;
+            var UserInfo = await _dbcontext.UserInfo.FirstOrDefaultAsync(a => a.PhoneNumber == mobileNumber);
+
+            var CustomerRevenues = await _dbcontext.CustomerRevenue.Where(a => a.UserID == UserInfo.Id).ToListAsync(); 
+
+            var groupedByActivity = CustomerRevenues
+                .GroupBy(cr => cr.ActivityId)
+                .Select(group => new
+                {
+                    ActivityId = group.Key,
+                    Revenues = group.ToList()
+                }).ToList();
+
+            return Ok(groupedByActivity);
         }
     }
 }
