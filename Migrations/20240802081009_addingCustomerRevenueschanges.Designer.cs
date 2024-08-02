@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using Agri_Smart.data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -12,9 +13,10 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Agri_Smart.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240802081009_addingCustomerRevenueschanges")]
+    partial class addingCustomerRevenueschanges
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -107,14 +109,8 @@ namespace Agri_Smart.Migrations
                     b.Property<string>("Name")
                         .HasColumnType("text");
 
-                    b.Property<decimal?>("Price")
-                        .HasColumnType("numeric");
-
                     b.Property<string>("PriceUnits")
                         .HasColumnType("text");
-
-                    b.Property<decimal?>("Quantity")
-                        .HasColumnType("numeric");
 
                     b.Property<string>("QuantityUnits")
                         .HasColumnType("text");

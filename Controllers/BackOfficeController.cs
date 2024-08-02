@@ -102,6 +102,23 @@ namespace Agri_Smart.Controllers
 
             return Ok(new { message = "Data inserted successfully." });
         }
+        [HttpPost]
+        [Route("SaveRevenueCategory")]
+        public async Task<IActionResult> SaveRevenueCategory([FromBody] List<Revenue> request)
+        {
+            foreach (var req in request)
+            {
+                var revenue = new Revenue();
+
+                revenue.RevenueId = Guid.NewGuid();
+                revenue.RevenueName = req.RevenueName;
+
+                await _dbcontext.Revenue.AddAsync(revenue);
+                _dbcontext.SaveChanges();
+            }
+
+            return Ok(new { message = "Data inserted successfully." });
+        }
 
     }
 }

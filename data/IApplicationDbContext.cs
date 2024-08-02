@@ -20,6 +20,8 @@ namespace Agri_Smart.data
         DbSet<CategorySubExpenses> CategorySubExpenses { get; set; }
         DbSet<MapCategorySubCategory> MapCategorySubCategory { get; set; }
         DbSet<SubCategory> SubCategory { get; set; }
+        DbSet<Revenue> Revenue { get; set; }
+        DbSet<CustomerRevenue> CustomerRevenue { get; set; }
 
         int SaveChanges();
         DataTable ExecuteReader

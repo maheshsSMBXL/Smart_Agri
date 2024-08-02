@@ -376,6 +376,46 @@ namespace Agri_Smart.Controllers
 
             return Ok(result);
         }
+        [HttpGet]
+        [Route("GetRevenueCategories")]
+        [AllowAnonymous]
+        public async Task<IActionResult> GetRevenueCategories()
+        {
+            var RevenueCategories = await _dbcontext.Revenue.ToListAsync();
+            return Ok(RevenueCategories);
+        }
+        [HttpPost]
+        [Route("SaveCustomerRevenue")]
+        public async Task<IActionResult> SaveCustomerRevenue([FromBody] List<CustomerRevenue> request)
+        {
+            var mobileNumber = User?.Claims?.FirstOrDefault(c => c.Type == "MobileNumber")?.Value;
+            var UserInfo = await _dbcontext.UserInfo.FirstOrDefaultAsync(a => a.PhoneNumber == mobileNumber);
+            var activityId = Guid.NewGuid();
+            var activityCretedDate = new DateTime();
 
+            var customerRevenue = new CustomerRevenue();
+            foreach (var req in request) 
+            {
+                customerRevenue.Id = Guid.NewGuid();
+                customerRevenue.RevenueCategoryId = req.RevenueCategoryId;
+                customerRevenue.RevenueCategoryName = req.RevenueCategoryName;
+                customerRevenue.ActivityId = activityId;
+                customerRevenue.Name = req.Name;
+                customerRevenue.Price = req.Price;
+                customerRevenue.PriceUnits = req.PriceUnits;
+                customerRevenue.Quantity = req.Quantity;
+                customerRevenue.QuantityUnits = req.QuantityUnits;
+                customerRevenue.Date = req.Date;
+                customerRevenue.Total = req.Total;
+                customerRevenue.ActivityTotal = req.ActivityTotal;
+                customerRevenue.CreatedDate = activityCretedDate;
+                customerRevenue.UserID = UserInfo.Id;
+                customerRevenue.CreatedBy = UserInfo.Id;
+                await _dbcontext.CustomerRevenue.AddAsync(customerRevenue);
+            }
+            _dbcontext.SaveChanges();
+
+            return Ok("Data Inserted Successfully.");
+        }
     }
 }
