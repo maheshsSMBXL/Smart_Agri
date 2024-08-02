@@ -163,7 +163,7 @@ namespace Agri_Smart.Controllers
                 }
             }
 
-            return Ok(new { message = "Data inserted successfully." });
+            return Ok(new { Status = "Success", Message = "Data Saved Successfully." });
         }
         [AllowAnonymous]
         [HttpPost]
@@ -186,7 +186,7 @@ namespace Agri_Smart.Controllers
                 _dbcontext.SaveChanges();
             }
 
-            return Ok(new { message = "Data inserted successfully." });
+            return Ok(new { Status = "Success", Message = "Data Saved Successfully." });
         }
 
 

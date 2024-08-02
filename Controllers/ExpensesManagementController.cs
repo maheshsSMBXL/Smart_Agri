@@ -151,7 +151,7 @@ namespace Agri_Smart.Controllers
             _dbcontext.SaveChanges();
 
 
-            return Ok("Data Saved Successfully.");
+            return Ok(new { Status = "Success", Message = "Data Saved Successfully." });
         }
         [HttpPost]
         [Route("SaveExpensesNew")]
@@ -281,7 +281,7 @@ namespace Agri_Smart.Controllers
 
             _dbcontext.SaveChanges();
 
-            return Ok("Data Saved Successfully.");
+            return Ok(new { Status = "Success", Message = "Data Saved Successfully." });
         }
 
         [HttpGet]
@@ -361,9 +361,9 @@ namespace Agri_Smart.Controllers
                 customerRevenue.CreatedBy = UserInfo.Id;
                 await _dbcontext.CustomerRevenue.AddAsync(customerRevenue);
                 _dbcontext.SaveChanges();
-            }            
+            }
 
-            return Ok("Data Inserted Successfully.");
+            return Ok(new { Status = "Success", Message = "Data Saved Successfully." });
         }
         [HttpGet]
         [Route("GetCustomerRevenues")]
