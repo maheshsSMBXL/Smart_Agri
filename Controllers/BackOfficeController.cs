@@ -86,15 +86,15 @@ namespace Agri_Smart.Controllers
         }
         [HttpPost]
         [Route("MapCategorySubCategory")]
-        public async Task<IActionResult> MapCategorySubCategory([FromBody] List<MapCategorySubCategory> request)
+        public async Task<IActionResult> MapCategorySubCategory([FromBody] MapCatSubCat request)
         {
-            foreach (var req in request)
+            foreach (var req in request.SubCategoryId)
             {
                 var mapCategorySubCategory = new MapCategorySubCategory();
 
                 mapCategorySubCategory.Id = Guid.NewGuid();
-                mapCategorySubCategory.CategoryId = req.CategoryId;
-                mapCategorySubCategory.SubCategoryId = req.SubCategoryId;
+                mapCategorySubCategory.CategoryId = request.CategoryId;
+                mapCategorySubCategory.SubCategoryId = req;
 
                 await _dbcontext.MapCategorySubCategory.AddAsync(mapCategorySubCategory);
                 _dbcontext.SaveChanges();
