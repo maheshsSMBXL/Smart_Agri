@@ -285,8 +285,8 @@ namespace Agri_Smart.Controllers
         }
 
         [HttpGet]
-        [Route("GetExpenses/{categoryId}")]
-        public async Task<IActionResult> GetExpenses(Guid categoryId)
+        [Route("GetExpenses")]
+        public async Task<IActionResult> GetExpenses()
         {
             var mobileNumber = User?.Claims?.FirstOrDefault(c => c.Type == "MobileNumber")?.Value;
             var userInfo = await _dbcontext.UserInfo.FirstOrDefaultAsync(a => a.PhoneNumber == mobileNumber);
@@ -297,7 +297,7 @@ namespace Agri_Smart.Controllers
             }
 
             var expenses = await _dbcontext.Expenses
-                .Where(e => e.UserID == userInfo.Id && e.CategoryId == categoryId)
+                .Where(e => e.UserID == userInfo.Id)
                 .ToListAsync();
 
             if (expenses == null)
@@ -306,19 +306,19 @@ namespace Agri_Smart.Controllers
             }
 
             var categorySubExpenses = await _dbcontext.CategorySubExpenses
-                .Where(cse => cse.CategoryId == categoryId && cse.ActivityId == expenses.FirstOrDefault().ActivityId)
+                .Where(cse => cse.CategoryId == expenses.FirstOrDefault().CategoryId && cse.ActivityId == expenses.FirstOrDefault().ActivityId)
                 .ToListAsync();
 
             var workers = await _dbcontext.Workers
-                .Where(w => w.CategoryId == categoryId && w.ActivityId == expenses.FirstOrDefault().ActivityId)
+                .Where(w => w.CategoryId == expenses.FirstOrDefault().CategoryId && w.ActivityId == expenses.FirstOrDefault().ActivityId)
                 .ToListAsync();
 
             var machineries = await _dbcontext.Machineries
-                .Where(m => m.CategoryId == categoryId && m.ActivityId == expenses.FirstOrDefault().ActivityId)
+                .Where(m => m.CategoryId == expenses.FirstOrDefault().CategoryId && m.ActivityId == expenses.FirstOrDefault().ActivityId)
                 .ToListAsync();
 
             var otherExpenses = await _dbcontext.OtherExpenses
-                .Where(oe => oe.CategoryId == categoryId && oe.ActivityId == expenses.FirstOrDefault().ActivityId)
+                .Where(oe => oe.CategoryId == expenses.FirstOrDefault().CategoryId && oe.ActivityId == expenses.FirstOrDefault().ActivityId)
                 .ToListAsync();
 
             var result = new
