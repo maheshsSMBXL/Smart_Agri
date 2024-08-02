@@ -18,6 +18,8 @@ namespace Agri_Smart.data
         DbSet<Machinery> Machineries { get; set; }
         DbSet<OtherExpenses> OtherExpenses { get; set; }
         DbSet<CategorySubExpenses> CategorySubExpenses { get; set; }
+        DbSet<MapCategorySubCategory> MapCategorySubCategory { get; set; }
+        DbSet<SubCategory> SubCategory { get; set; }
 
         int SaveChanges();
         DataTable ExecuteReader

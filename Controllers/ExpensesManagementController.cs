@@ -30,10 +30,38 @@ namespace Agri_Smart.Controllers
         }
         [HttpGet]
         [Route("GetExpensesCategories")]
+        [AllowAnonymous]
         public async Task<IActionResult> GetExpensesCategories()
         {
             var categories = await _dbcontext.Category.ToListAsync();
-            return Ok(categories);
+
+            var categorySubCategories = new List<CategorySubCategory>();
+            foreach (var cat in categories)
+            {
+                var categorySubCategory = new CategorySubCategory();
+                categorySubCategory.Id = cat.CategoryId;
+                categorySubCategory.Name = cat.CategoryName;
+                categorySubCategory.Icon = cat.Icon;
+
+                var subCategoriesList = await _dbcontext.MapCategorySubCategory.Where(a => a.CategoryId == cat.CategoryId).
+                    Select(a => a.SubCategoryId).ToListAsync();
+
+                var finalSubCategories = new List<SubCategory>();
+                foreach (var subCategoryId in subCategoriesList) 
+                {
+                    var subCategory = new SubCategory();
+                    var subCategories = await _dbcontext.SubCategory.Where(a => a.SubCategoryId == subCategoryId).ToListAsync();
+                    foreach (var val in subCategories) 
+                    {
+                        subCategory.SubCategoryId = val.SubCategoryId;
+                        subCategory.SubCategoryName = val.SubCategoryName;
+                    }
+                    finalSubCategories.Add(subCategory);
+                    categorySubCategory.SubCategory = finalSubCategories;
+                }
+                categorySubCategories.Add(categorySubCategory);
+            }
+            return Ok(categorySubCategories);            
         }
         [HttpPost]
         [Route("SaveExpenses")]

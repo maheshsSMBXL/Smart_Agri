@@ -67,6 +67,41 @@ namespace Agri_Smart.Controllers
 
             return Ok(new { message = "Data inserted successfully." });            
         }
+        [HttpPost]
+        [Route("SaveSubCategory")]
+        public async Task<IActionResult> SaveSubCategory([FromBody] List<SubCategory> request)
+        {
+            foreach (var req in request)
+            {
+                var subCategory = new SubCategory();
+
+                subCategory.SubCategoryId = Guid.NewGuid();
+                subCategory.SubCategoryName = req.SubCategoryName;
+
+                await _dbcontext.SubCategory.AddAsync(subCategory);
+                _dbcontext.SaveChanges();
+            }
+
+            return Ok(new { message = "Data inserted successfully." });
+        }
+        [HttpPost]
+        [Route("MapCategorySubCategory")]
+        public async Task<IActionResult> MapCategorySubCategory([FromBody] List<MapCategorySubCategory> request)
+        {
+            foreach (var req in request)
+            {
+                var mapCategorySubCategory = new MapCategorySubCategory();
+
+                mapCategorySubCategory.Id = Guid.NewGuid();
+                mapCategorySubCategory.CategoryId = req.CategoryId;
+                mapCategorySubCategory.SubCategoryId = req.SubCategoryId;
+
+                await _dbcontext.MapCategorySubCategory.AddAsync(mapCategorySubCategory);
+                _dbcontext.SaveChanges();
+            }
+
+            return Ok(new { message = "Data inserted successfully." });
+        }
 
     }
 }

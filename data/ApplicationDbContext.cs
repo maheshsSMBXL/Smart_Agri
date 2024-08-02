@@ -27,6 +27,8 @@ namespace Agri_Smart.data
         public DbSet<Machinery> Machineries { get; set; }
         public DbSet<OtherExpenses> OtherExpenses { get; set; }
         public DbSet<CategorySubExpenses> CategorySubExpenses { get; set; }
+        public DbSet<MapCategorySubCategory> MapCategorySubCategory { get; set; }
+        public DbSet<SubCategory> SubCategory { get; set; }
 
         public override int SaveChanges()
         {
