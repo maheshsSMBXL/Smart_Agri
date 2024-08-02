@@ -31,6 +31,8 @@ namespace Agri_Smart.data
         public DbSet<SubCategory> SubCategory { get; set; }
         public DbSet<Revenue> Revenue { get; set; }
         public DbSet<CustomerRevenue> CustomerRevenue { get; set; }
+        public DbSet<CalendarCommonEvents> CalendarCommonEvents { get; set; }
+        public DbSet<UserCalendarEvents> UserCalendarEvents { get; set; }
 
         public override int SaveChanges()
         {

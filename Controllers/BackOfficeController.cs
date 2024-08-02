@@ -119,6 +119,15 @@ namespace Agri_Smart.Controllers
 
             return Ok(new { message = "Data inserted successfully." });
         }
+        [HttpPost]
+        [Route("SaveCommonCalendarEvents")]
+        public async Task<IActionResult> SaveCommonCalendarEvents([FromBody] CalendarCommonEvents calendarCommonEvents)
+        {
+            await _dbcontext.CalendarCommonEvents.AddAsync(calendarCommonEvents);
+            _dbcontext.SaveChanges();
+
+            return Ok(new { Status = "Success", Message = "Data saved successfully." });
+        }
 
     }
 }

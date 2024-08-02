@@ -22,6 +22,8 @@ namespace Agri_Smart.data
         DbSet<SubCategory> SubCategory { get; set; }
         DbSet<Revenue> Revenue { get; set; }
         DbSet<CustomerRevenue> CustomerRevenue { get; set; }
+        DbSet<CalendarCommonEvents> CalendarCommonEvents { get; set; }
+        DbSet<UserCalendarEvents> UserCalendarEvents { get; set; }
 
         int SaveChanges();
         DataTable ExecuteReader
