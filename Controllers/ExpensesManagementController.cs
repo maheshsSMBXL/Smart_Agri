@@ -421,11 +421,11 @@ namespace Agri_Smart.Controllers
         }
         [HttpPost]
         [Route("SaveCustomerBudget")]
-        public async Task<IActionResult> SaveCustomerBudget([FromBody] double budget)
+        public async Task<IActionResult> SaveCustomerBudget([FromBody] BudgetInput request)
         {
             var mobileNumber = User?.Claims?.FirstOrDefault(c => c.Type == "MobileNumber")?.Value;
             var UserInfo = await _dbcontext.UserInfo.FirstOrDefaultAsync(a => a.PhoneNumber == mobileNumber);
-            UserInfo.BudgetAmount = budget;
+            UserInfo.BudgetAmount = (double?)request.Budget;
             _dbcontext.SaveChanges();
 
             return Ok(new { Status = "Success", Message = "Data Saved Successfully." });
