@@ -6,6 +6,7 @@
         public CategorisedExpenses CategorisedExpenses { get; set; } = new CategorisedExpenses(); // Initialize the property
         public decimal? TotalRevenue { get; set; }
         public CategorisedRevenue CategorisedRevenues { get; set; } = new CategorisedRevenue(); // Initialize the property
+        public decimal? Budget { get; set; }
     }
     public class CategorisedExpenses
     {

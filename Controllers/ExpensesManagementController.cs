@@ -415,8 +415,20 @@ namespace Agri_Smart.Controllers
             totalRevenueAndExpenses.CategorisedExpenses.Workers = (decimal)Workers;
             totalRevenueAndExpenses.CategorisedExpenses.Machinery = (decimal)Machinery;
             totalRevenueAndExpenses.CategorisedExpenses.OtherExpenses = (decimal)Machinery;
+            totalRevenueAndExpenses.Budget = (decimal?)UserInfo?.BudgetAmount;
 
             return Ok(totalRevenueAndExpenses);
+        }
+        [HttpPost]
+        [Route("SaveCustomerBudget")]
+        public async Task<IActionResult> SaveCustomerBudget([FromBody] double budget)
+        {
+            var mobileNumber = User?.Claims?.FirstOrDefault(c => c.Type == "MobileNumber")?.Value;
+            var UserInfo = await _dbcontext.UserInfo.FirstOrDefaultAsync(a => a.PhoneNumber == mobileNumber);
+            UserInfo.BudgetAmount = budget;
+            _dbcontext.SaveChanges();
+
+            return Ok(new { Status = "Success", Message = "Data Saved Successfully." });
         }
     }
 }
