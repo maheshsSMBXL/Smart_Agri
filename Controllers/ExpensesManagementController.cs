@@ -169,8 +169,9 @@ namespace Agri_Smart.Controllers
 
                 if (expenses == null)
                 {
+                    var activeId = new Guid();
                     expenses = new Expenses();
-                    expenses.ActivityId = request.ActivityId != null ? request.ActivityId : activityId;
+                    expenses.ActivityId = request.ActivityId != null && request.ActivityId != new Guid() ? request.ActivityId : activityId;
                     expenses.CreatedDate = activityCretedDate;
                     expenses.UserID = UserInfo?.Id;
                     expenses.CreatedBy = UserInfo?.Id;
@@ -196,7 +197,7 @@ namespace Agri_Smart.Controllers
                     {
                         var categorySubExpenses = new CategorySubExpenses();
                         categorySubExpenses.CategoryId = request.CategoryId;
-                        categorySubExpenses.ActivityId = request.ActivityId != null ? request.ActivityId : activityId;
+                        categorySubExpenses.ActivityId = request.ActivityId != null && request.ActivityId != new Guid() ? request.ActivityId : activityId;
                         categorySubExpenses.IrrigationDuration = request.IrrigationDuration != null
                             ? new TimeSpan((int)(request?.IrrigationDuration?.Hours), (int)(request?.IrrigationDuration?.Minutes), (int)(request?.IrrigationDuration?.Seconds))
                             : null;
@@ -224,7 +225,7 @@ namespace Agri_Smart.Controllers
                     {
                         var worker = new Workers();
                         worker.CategoryId = request.CategoryId;
-                        worker.ActivityId = request.ActivityId != null ? request.ActivityId : activityId;
+                        worker.ActivityId = request.ActivityId != null && request.ActivityId != new Guid() ? request.ActivityId : activityId;
                         worker.NoOfWorkers = workerExpense.NoOfWorkers;
                         worker.CostPerWorker = workerExpense.CostPerWorker;
                         worker.TotalCost = workerExpense.TotalCost;
@@ -246,7 +247,7 @@ namespace Agri_Smart.Controllers
                     {
                         var machinery = new Machinery();
                         machinery.CategoryId = request.CategoryId;
-                        machinery.ActivityId = request.ActivityId != null ? request.ActivityId : activityId;
+                        machinery.ActivityId = request.ActivityId != null && request.ActivityId != new Guid() ? request.ActivityId : activityId;
                         machinery.NoOfMachines = machineryExpense.NoOfMachines;
                         machinery.CostPerMachine = machineryExpense.CostPerMachine;
                         machinery.TotalCost = machineryExpense.TotalCost;
@@ -268,7 +269,7 @@ namespace Agri_Smart.Controllers
                     {
                         var otherExpenses = new OtherExpenses();
                         otherExpenses.CategoryId = request.CategoryId;
-                        otherExpenses.ActivityId = request.ActivityId != null ? request.ActivityId : activityId;
+                        otherExpenses.ActivityId = request.ActivityId != null && request.ActivityId != new Guid() ? request.ActivityId : activityId;
                         otherExpenses.Expense = otherExpense.Expense;
                         otherExpenses.Cost = otherExpense.Cost;
                         otherExpenses.TotalCost = otherExpense.TotalCost;
