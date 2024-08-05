@@ -8,5 +8,6 @@ namespace Agri_Smart.Models
         public List<Workers> Workers { get; set; }
         public List<Machinery> Machinery { get; set; }
         public List<OtherExpenses> OtherExpenses { get; set; }
+        public List<CategorySubExpenses> SubExpenses { get; set; }
     }
 }

@@ -317,6 +317,7 @@ namespace Agri_Smart.Controllers
                     .ToListAsync();
 
                 CustomerExpense.Expenses = expense;
+                CustomerExpense.SubExpenses = categorySubExpenses;
                 CustomerExpense.Workers = workers;
                 CustomerExpense.Machinery = machineries;
                 CustomerExpense.OtherExpenses = otherExpenses;
