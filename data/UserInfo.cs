@@ -25,5 +25,6 @@ namespace Agri_Smart.data
         public double? Latitude { get; set; }
         public double? Longitude { get; set; }
         public double? BudgetAmount { get; set; }
+        public DateTime? UserCreatedDate { get; set; }
     }
 }
