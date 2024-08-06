@@ -36,12 +36,33 @@ namespace Agri_Smart.Controllers
             var mobileNumber = User?.Claims?.FirstOrDefault(c => c.Type == "MobileNumber")?.Value;
             var userInfo = await _dbcontext.UserInfo.FirstOrDefaultAsync(a => a.PhoneNumber == mobileNumber);
 
-            userCalendarEvents.UserID = userInfo.Id;
+            if (userCalendarEvents.EventID == null || userCalendarEvents.EventID == Guid.NewGuid())
+            {
+                userCalendarEvents.UserID = userInfo.Id;
+                userCalendarEvents.EventID = Guid.NewGuid();
+                userCalendarEvents.CreatedDate = new DateTime();
 
-            await _dbcontext.UserCalendarEvents.AddAsync(userCalendarEvents);
-            _dbcontext.SaveChanges();
+                await _dbcontext.UserCalendarEvents.AddAsync(userCalendarEvents);
+                _dbcontext.SaveChanges();
 
-            return Ok(new { Status = "Success", Message = "Data saved successfully." });
+                return Ok(new { Status = "Success", Message = "Data saved successfully." });
+            }
+            else 
+            {
+                var calendarEvents = await _dbcontext.UserCalendarEvents.FirstOrDefaultAsync(a => a.EventID == userCalendarEvents.EventID);
+
+                _dbcontext.UserCalendarEvents.RemoveRange(calendarEvents);
+
+                userCalendarEvents.UserID = userInfo.Id;
+                userCalendarEvents.CreatedDate = new DateTime();
+
+                await _dbcontext.UserCalendarEvents.AddAsync(userCalendarEvents);
+                _dbcontext.SaveChanges();
+
+                return Ok(new { Status = "Success", Message = "Data Updated Successfully." });
+
+            }
+            return Ok();
         }
         [HttpGet]
         [Route("GetCalendarEvents")]

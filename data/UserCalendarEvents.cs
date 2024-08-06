@@ -12,6 +12,8 @@ namespace Agri_Smart.data
         public DateTime? End { get; set; }
         public string? Title { get; set; }
         public List<string>? MetaDetails { get; set; }
-        public Guid UserID { get; set; }
+        public Guid? UserID { get; set; }
+        public Guid? EventID { get; set; }
+        public DateTime? CreatedDate { get; set; }
     }
 }
