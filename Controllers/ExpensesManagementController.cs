@@ -367,6 +367,65 @@ namespace Agri_Smart.Controllers
 
             return Ok(new { Status = "Success", Message = "Data Saved Successfully." });
         }
+        [HttpPost]
+        [Route("SaveCustomerRevenueNew")]
+        public async Task<IActionResult> SaveCustomerRevenueNew([FromBody] CustomerRevenues request)
+        {
+            var mobileNumber = User?.Claims?.FirstOrDefault(c => c.Type == "MobileNumber")?.Value;
+            var UserInfo = await _dbcontext.UserInfo.FirstOrDefaultAsync(a => a.PhoneNumber == mobileNumber);
+            var activityId = Guid.NewGuid();
+            var activityCretedDate = new DateTime();
+
+            var customerRevenue = new CustomerRevenue();
+            var customerRevenues = await _dbcontext.CustomerRevenue.Where(a => a.ActivityId == request.ActivityId).ToListAsync();
+
+            _dbcontext.CustomerRevenue.RemoveRange(customerRevenues);
+            if (request.RevenueDetails != null) 
+            {
+                foreach (var req in request.RevenueDetails)
+                {
+                    customerRevenue.Id = Guid.NewGuid();
+                    customerRevenue.RevenueCategoryId = (Guid)req.CategoryId;
+                    customerRevenue.RevenueCategoryName = req.CategoryName;
+                    customerRevenue.ActivityId = (Guid)(request.ActivityId != null && request.ActivityId != new Guid() ? request.ActivityId : activityId);
+                    customerRevenue.Name = req.RevenueName;
+                    customerRevenue.Price = req.Amount;                    
+                    customerRevenue.Date = req.Date;
+                    customerRevenue.Total = req.Total;
+                    customerRevenue.ActivityTotal = req.Total;
+                    customerRevenue.CreatedDate = activityCretedDate;
+                    customerRevenue.UserID = UserInfo.Id;
+                    customerRevenue.CreatedBy = UserInfo.Id;
+                    await _dbcontext.CustomerRevenue.AddAsync(customerRevenue);
+                    _dbcontext.SaveChanges();
+                }
+                return Ok(new { Status = "Success", Message = "Data Saved Successfully." });
+            }
+            if (request.HarvestedAndSold != null)
+            {
+                foreach (var req in request.HarvestedAndSold)
+                {
+                    customerRevenue.Id = Guid.NewGuid();
+                    customerRevenue.RevenueCategoryId = (Guid)req.CategoryId;
+                    customerRevenue.RevenueCategoryName = req.CategoryName;
+                    customerRevenue.ActivityId = activityId;
+                    customerRevenue.Price = req.Price;
+                    customerRevenue.PriceUnits = req.PriceUnits;
+                    customerRevenue.Quantity = req.Quantity;
+                    customerRevenue.QuantityUnits = req.QuantityUnits;
+                    customerRevenue.Date = req.Date;
+                    customerRevenue.Total = req.Total;
+                    customerRevenue.ActivityTotal = req.Total;
+                    customerRevenue.CreatedDate = activityCretedDate;
+                    customerRevenue.UserID = UserInfo.Id;
+                    customerRevenue.CreatedBy = UserInfo.Id;
+                    await _dbcontext.CustomerRevenue.AddAsync(customerRevenue);
+                    _dbcontext.SaveChanges();
+                }
+                return Ok(new { Status = "Success", Message = "Data Saved Successfully." });
+            }
+            return Ok();
+        }
         [HttpGet]
         [Route("GetCustomerRevenues")]
         public async Task<IActionResult> GetCustomerRevenues()
@@ -374,17 +433,40 @@ namespace Agri_Smart.Controllers
             var mobileNumber = User?.Claims?.FirstOrDefault(c => c.Type == "MobileNumber")?.Value;
             var UserInfo = await _dbcontext.UserInfo.FirstOrDefaultAsync(a => a.PhoneNumber == mobileNumber);
 
-            var CustomerRevenues = await _dbcontext.CustomerRevenue.Where(a => a.UserID == UserInfo.Id).ToListAsync(); 
+            var CustomerRevenues = await _dbcontext.CustomerRevenue.Where(a => a.UserID == UserInfo.Id).ToListAsync();
 
-            var groupedByActivity = CustomerRevenues
-                .GroupBy(cr => cr.ActivityId)
-                .Select(group => new
+            var customerRevenuesGrouped = CustomerRevenues
+        .GroupBy(cr => cr.ActivityId)
+        .Select(group => new CustomerRevenues
+        {
+            ActivityId = group.Key,
+            RevenueDetails = group
+                .Where(cr => cr.RevenueCategoryName == "Revenue details") // Assuming you have some way to differentiate between RevenueDetails and HarvestedAndSold
+                .Select(cr => new RevenueDetails
                 {
-                    ActivityId = group.Key,
-                    Revenues = group.ToList()
-                }).ToList();
+                    CategoryId = cr.RevenueCategoryId,
+                    CategoryName = cr.RevenueCategoryName,
+                    RevenueName = cr.Name,
+                    Amount = cr.Price,
+                    Date = cr.Date,
+                    Total = cr.Total
+                }).ToList(),
+            HarvestedAndSold = group
+                .Where(cr => cr.RevenueCategoryName == "Harvested and sold") // Assuming you have some way to differentiate between RevenueDetails and HarvestedAndSold
+                .Select(cr => new HarvestedAndSold
+                {
+                    CategoryId = cr.RevenueCategoryId,
+                    CategoryName = cr.RevenueCategoryName,
+                    Quantity = cr.Quantity,
+                    QuantityUnits = cr.QuantityUnits,
+                    Price = cr.Price,
+                    PriceUnits = cr.PriceUnits,
+                    Date = cr.Date,
+                    Total = cr.Total
+                }).ToList()
+        }).ToList();
 
-            return Ok(groupedByActivity);
+            return Ok(customerRevenuesGrouped);
         }
         [HttpGet]
         [Route("GetToatlRevenueAndExpenses")]
