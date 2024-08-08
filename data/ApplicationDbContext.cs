@@ -33,6 +33,7 @@ namespace Agri_Smart.data
         public DbSet<CustomerRevenue> CustomerRevenue { get; set; }
         public DbSet<CalendarCommonEvents> CalendarCommonEvents { get; set; }
         public DbSet<UserCalendarEvents> UserCalendarEvents { get; set; }
+        public DbSet<sensorsavgdata> sensorsavgdata { get; set; }
 
         public override int SaveChanges()
         {

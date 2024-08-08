@@ -358,6 +358,18 @@ namespace Agri_Smart.Controllers
             return Ok(Result.ToList());
         }
 
+        [HttpGet]
+        [Route("GetSensorAverageData")]
+        public async Task<IActionResult> GetSensorAverageData()
+        {
+            var mobileNumber = User?.Claims?.FirstOrDefault(c => c.Type == "MobileNumber")?.Value;
+            var UserInfo = await _dbcontext.UserInfo.FirstOrDefaultAsync(a => a.PhoneNumber == mobileNumber);
+            var macId = await _dbcontext.Devices.Where(a => a.TenantId == UserInfo.TenantId).Select(a => a.MacId).FirstOrDefaultAsync();
+
+            var SensorAgerageData = await _dbcontext.sensorsavgdata.ToListAsync();
+            return Ok(SensorAgerageData);
+        }
+
         [HttpPost]
         [Route("SaveOnBoardData")]
         public async Task<IActionResult> SaveOnBoardData([FromBody] UserInfo request)

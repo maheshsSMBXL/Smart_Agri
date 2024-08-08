@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using Agri_Smart.data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -12,9 +13,10 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Agri_Smart.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240808100243_sensorAverageData")]
+    partial class sensorAverageData
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -450,7 +452,7 @@ namespace Agri_Smart.Migrations
                     b.ToTable("Revenue");
                 });
 
-            modelBuilder.Entity("Agri_Smart.data.sensorsavgdata", b =>
+            modelBuilder.Entity("Agri_Smart.data.SensorAverageData", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -491,7 +493,7 @@ namespace Agri_Smart.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("sensorsavgdata");
+                    b.ToTable("SensorAverageData");
                 });
 
             modelBuilder.Entity("Agri_Smart.data.SubCategory", b =>

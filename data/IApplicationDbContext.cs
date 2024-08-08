@@ -24,6 +24,7 @@ namespace Agri_Smart.data
         DbSet<CustomerRevenue> CustomerRevenue { get; set; }
         DbSet<CalendarCommonEvents> CalendarCommonEvents { get; set; }
         DbSet<UserCalendarEvents> UserCalendarEvents { get; set; }
+        DbSet<sensorsavgdata> sensorsavgdata { get; set; }
 
         int SaveChanges();
         DataTable ExecuteReader
