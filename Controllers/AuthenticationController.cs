@@ -1,5 +1,6 @@
 ﻿using Agri_Smart.data;
 using Agri_Smart.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -152,10 +153,39 @@ namespace Agri_Smart.Controllers
             var token = tokenHandler.CreateToken(tokenDescriptor);
             return tokenHandler.WriteToken(token);
         }
+        [Authorize]
+        [HttpDelete("DeleteUser")]
+        public async Task<IActionResult> DeleteUser()
+        {
+            // Get the mobile number from the claims
+            var mobileNumber = User?.Claims?.FirstOrDefault(c => c.Type == "MobileNumber")?.Value;
 
-        //public IActionResult Index()
-        //{
-        //    return View();
-        //}
+            // Find the user with the given mobile number
+            var user = await _userManager.Users.FirstOrDefaultAsync(a => a.PhoneNumber == mobileNumber);
+
+            var userInfo = await _dbcontext.UserInfo.FirstOrDefaultAsync(a => a.PhoneNumber == mobileNumber);
+
+            if (user == null)
+            {
+                return NotFound(new { message = "User not found" });
+            }
+
+            // Attempt to delete the user
+            var result = await _userManager.DeleteAsync(user);
+
+
+            if (result.Succeeded)
+            {
+                if (userInfo != null)
+                {
+                    _dbcontext.UserInfo.Remove(userInfo);
+                    _dbcontext.SaveChanges();
+                }
+                return Ok(new { message = "User deleted successfully" });
+            }
+
+            // If deletion fails, return a failure response
+            return StatusCode(500, new { message = "Error deleting user", errors = result.Errors });
+        }
     }
 }
