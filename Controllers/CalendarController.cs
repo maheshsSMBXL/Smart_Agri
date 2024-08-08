@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Globalization;
 
 namespace Agri_Smart.Controllers
 {
@@ -71,11 +72,24 @@ namespace Agri_Smart.Controllers
             var mobileNumber = User?.Claims?.FirstOrDefault(c => c.Type == "MobileNumber")?.Value;
             var userInfo = await _dbcontext.UserInfo.FirstOrDefaultAsync(a => a.PhoneNumber == mobileNumber);
 
+            var CropStartDate = userInfo.CropGrowingStartDate;
+
             var calendarEvents = new CalendarEvents();
 
             var calendarCommonEvents = await _dbcontext.CalendarCommonEvents.ToListAsync();
 
             var userCalendarEvents = await _dbcontext.UserCalendarEvents.Where(a => a.UserID == userInfo.Id).ToListAsync();
+
+            foreach (var calendarEvent in calendarCommonEvents) 
+            {               
+                // Adjust the event's StartDate
+                calendarEvent.Start = calendarEvent.Start
+                    .Value.AddMonths(CropStartDate.Value.Month - 1)
+                    .AddDays(CropStartDate.Value.Day);
+                calendarEvent.End = calendarEvent.End
+                    .Value.AddMonths(CropStartDate.Value.Month - 1)
+                    .AddDays(CropStartDate.Value.Day);
+            }
 
             calendarEvents.CalendarCommonEvents = calendarCommonEvents;
             calendarEvents.UserCalendarEvents = userCalendarEvents;
