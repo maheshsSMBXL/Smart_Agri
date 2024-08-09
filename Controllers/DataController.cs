@@ -265,18 +265,18 @@ namespace Agri_Smart.Controllers
         {
             var mobileNumber = User?.Claims?.FirstOrDefault(c => c.Type == "MobileNumber")?.Value;
             var UserInfo = await _dbcontext.UserInfo.FirstOrDefaultAsync(a => a.PhoneNumber == mobileNumber);
-            var macIds = await _dbcontext.Devices.Where(a => a.PhoneNumber == UserInfo.PhoneNumber).Select(a => a.MacId).ToListAsync();
+            var DevicesData = await _dbcontext.Devices.Where(a => a.PhoneNumber == UserInfo.PhoneNumber).ToListAsync();
 
             var sensorsLatestDat = new List<SensorDataOutPut>();
 
-            foreach (var macId in macIds)
+            foreach (var device in DevicesData)
             {
                 var timeRangeStart = "2024-01-01T06:02:00.000Z";
                 var timeRangeStop = "2090-07-01T06:02:00.000Z";
                 string flux = $"from(bucket: \"{_bucket}\") " +
                     $"|> range(start: {timeRangeStart}, stop: {timeRangeStop}) " +
                     $"|> filter(fn: (r) => r[\"_measurement\"] == \"treesandrays_data\") " +
-                    $"|> filter(fn: (r) => r[\"tenant_id\"] == \"{macId}\") ";
+                    $"|> filter(fn: (r) => r[\"tenant_id\"] == \"{device.MacId}\") ";
                 //$"|> filter(fn: (r) => r[\"_field\"] == \"humidity_percentage\" or r[\"_field\"] == \"moisture\" or r[\"_field\"] == \"moisture_percentage\" or r[\"_field\"] == \"nitrogen\" or r[\"_field\"] == \"phosphorus\")";
 
                 var fluxTables = await _influxDBClient.GetQueryApi().QueryAsync(flux, _org);
@@ -320,6 +320,7 @@ namespace Agri_Smart.Controllers
 
                 var sensorLatestDat = new SensorDataOutPut
                 {
+                    TenantId = device.TenantId,
                     TemperatureCelsius = latestValues.ContainsKey("temperature_celsius") ? FormatDouble(latestValues["temperature_celsius"]["_value"]) : null,
                     TemperatureFahrenheit = latestValues.ContainsKey("temperature_fahrenheit") ? FormatDouble(latestValues["temperature_fahrenheit"]["_value"]) : null,
                     HumidityPercentage = latestValues.ContainsKey("humidity_percentage") ? FormatDouble(latestValues["humidity_percentage"]["_value"]) : null,
