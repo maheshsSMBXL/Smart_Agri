@@ -12,6 +12,7 @@ using Agri_Smart.data;
 using Microsoft.AspNetCore.Authorization;
 using System.IdentityModel.Tokens.Jwt;
 using InfluxDB.Client.Writes;
+using System.Globalization;
 
 namespace Agri_Smart.Controllers
 {
@@ -435,16 +436,115 @@ namespace Agri_Smart.Controllers
         }
 
         [HttpGet]
-        [Route("GetSensorAverageData")]
-        public async Task<IActionResult> GetSensorAverageData()
+        [Route("GetSensorWeeklyData/{tenantId}/{period}")]
+        public async Task<IActionResult> GetSensorWeeklyData(string period, string tenantId)
         {
             var mobileNumber = User?.Claims?.FirstOrDefault(c => c.Type == "MobileNumber")?.Value;
-            var UserInfo = await _dbcontext.UserInfo.FirstOrDefaultAsync(a => a.PhoneNumber == mobileNumber);
-            var macId = await _dbcontext.Devices.Where(a => a.TenantId == UserInfo.TenantId).Select(a => a.MacId).FirstOrDefaultAsync();
 
-            var SensorAgerageData = await _dbcontext.sensorsavgdata.ToListAsync();
-            return Ok(SensorAgerageData);
+            if (string.IsNullOrEmpty(mobileNumber))
+            {
+                return BadRequest(new { message = "Mobile number is missing from claims." });
+            }
+
+            // Retrieve the UserInfo and associated MacId
+            var userInfo = await _dbcontext.UserInfo
+                .FirstOrDefaultAsync(a => a.PhoneNumber == mobileNumber);
+
+            if (userInfo == null)
+            {
+                return NotFound(new { message = "User not found" });
+            }
+
+            var macId = await _dbcontext.Devices
+                .Where(a => a.TenantId == userInfo.TenantId)
+                .Select(a => a.MacId)
+                .FirstOrDefaultAsync();
+
+            
+            var now = DateTime.UtcNow;
+            DateTime startDate;
+            DateTime endDate;
+
+            IQueryable<sensorsavgdata> query;
+
+            switch (period.ToLower())
+            {
+                case "week":
+                    // Calculate the start and end of the current week
+                    var startOfWeek = now.AddDays(-(int)now.DayOfWeek); // Assuming Sunday is the start of the week
+                    startDate = startOfWeek;
+                    endDate = startOfWeek.AddDays(7).AddTicks(-1); // End of the week
+
+                    // Query sensor data for the week
+                    query = _dbcontext.sensorsavgdata
+                        .Where(data => 
+                        //data.macAddress == macId && 
+                        data.window_start >= startDate && data.window_start <= endDate);
+
+                    // Group by day and calculate average
+                    var weeklyData = await query
+                        .GroupBy(data => data.window_start.Value.Date)
+                        .Select(g => new
+                        {
+                            Date = g.Key,
+                            AvgTemperature = g.Average(x => x.avg_temperature) ?? 0,
+                            AvgTemperatureF = g.Average(x => x.avg_temperatureF) ?? 0,
+                            AvgHumidity = g.Average(x => x.avg_humidity) ?? 0,
+                            AvgSoilMoistureValue = g.Average(x => x.avg_soilMoistureValue) ?? 0,
+                            AvgSoilMoisturePercent = g.Average(x => x.avg_soilMoisturePercent) ?? 0,
+                            AvgNitrogen = g.Average(x => x.avg_nitrogen) ?? 0,
+                            AvgPhosphorous = g.Average(x => x.avg_phosphorous) ?? 0,
+                            AvgPotassium = g.Average(x => x.avg_potassium) ?? 0
+                        }).ToListAsync();
+
+                    return Ok(weeklyData);
+
+                case "month":
+                    // Calculate the start and end of the current month
+                    startDate = new DateTime(now.Year, now.Month, 1, 0, 0, 0, DateTimeKind.Utc); // Ensure UTC
+                    endDate = startDate.AddMonths(1).AddTicks(-1); // End of the month
+
+                    // Query sensor data for the month
+                    query = _dbcontext.sensorsavgdata
+                        .Where(data => 
+                        //data.macAddress == macId && 
+                        data.window_start >= startDate && data.window_start <= endDate);
+
+                    // Retrieve the data and process in-memory
+                    var monthlyDataRaw = await query.ToListAsync();
+
+                    // Group by week number within the month
+                    var monthlyData = monthlyDataRaw
+                        .GroupBy(data => GetWeekOfMonth(data.window_start.Value.Date))
+                        .Select(g => new
+                        {
+                            Week = g.Key,
+                            AvgTemperature = g.Average(x => x.avg_temperature) ?? 0,
+                            AvgTemperatureF = g.Average(x => x.avg_temperatureF) ?? 0,
+                            AvgHumidity = g.Average(x => x.avg_humidity) ?? 0,
+                            AvgSoilMoistureValue = g.Average(x => x.avg_soilMoistureValue) ?? 0,
+                            AvgSoilMoisturePercent = g.Average(x => x.avg_soilMoisturePercent) ?? 0,
+                            AvgNitrogen = g.Average(x => x.avg_nitrogen) ?? 0,
+                            AvgPhosphorous = g.Average(x => x.avg_phosphorous) ?? 0,
+                            AvgPotassium = g.Average(x => x.avg_potassium) ?? 0
+                        }).ToList();
+
+                    return Ok(monthlyData);
+
+                default:
+                    return BadRequest(new { message = "Invalid period specified. Use 'week' or 'month'." });
+            }
         }
+
+        // Helper method to get the week number of the month
+        private int GetWeekOfMonth(DateTime date)
+        {
+            // The first day of the month
+            var firstDayOfMonth = new DateTime(date.Year, date.Month, 1);
+            // The week number within the month
+            return (date.Day - 1) / 7 + 1;
+        }
+
 
         [HttpPost]
         [Route("SaveOnBoardData")]
