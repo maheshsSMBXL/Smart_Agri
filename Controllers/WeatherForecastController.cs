@@ -1,4 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
+using System.Net.Http;
+using System.Text.Json;
+using System.Threading.Tasks;
 
 namespace Agri_Smart.Controllers
 {
@@ -6,28 +10,40 @@ namespace Agri_Smart.Controllers
     [Route("[controller]")]
     public class WeatherForecastController : ControllerBase
     {
-        private static readonly string[] Summaries = new[]
-        {
-            "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-        };
+        private readonly IConfiguration _configuration;
 
-        private readonly ILogger<WeatherForecastController> _logger;
-
-        public WeatherForecastController(ILogger<WeatherForecastController> logger)
+        public WeatherForecastController(IConfiguration configuration)
         {
-            _logger = logger;
+            _configuration = configuration;
         }
 
-        [HttpGet(Name = "GetWeatherForecast")]
-        public IEnumerable<WeatherForecast> Get()
+        [HttpGet("forecast")]
+        public async Task<IActionResult> GetWeatherForecast([FromQuery] double lat, [FromQuery] double lon)
         {
-            return Enumerable.Range(1, 5).Select(index => new WeatherForecast
+            // Get the API key and base URL from appsettings.json
+            var apiKey = _configuration["OpenWeatherMap:ApiKey"];
+            var baseUrl = _configuration["OpenWeatherMap:BaseUrl"];
+
+            // Construct the full API URL
+            var url = $"{baseUrl}?lat={lat}&lon={lon}&appid={apiKey}";
+
+            using var httpClient = new HttpClient();
+            var response = await httpClient.GetAsync(url);
+
+            if (response.IsSuccessStatusCode)
             {
-                Date = DateTime.Now.AddDays(index),
-                TemperatureC = Random.Shared.Next(-20, 55),
-                Summary = Summaries[Random.Shared.Next(Summaries.Length)]
-            })
-            .ToArray();
+                var content = await response.Content.ReadAsStringAsync();
+
+                // Deserialize the JSON content to a dynamic object
+                var jsonResponse = JsonSerializer.Deserialize<dynamic>(content);
+
+                // Return the JSON response as an object
+                return Ok(jsonResponse);
+            }
+            else
+            {
+                return StatusCode((int)response.StatusCode, await response.Content.ReadAsStringAsync());
+            }
         }
     }
 }
