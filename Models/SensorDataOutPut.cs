@@ -3,6 +3,7 @@
     public class SensorDataOutPut
     {
         public string TenantId { get; set; }
+        public string DeviceName { get; set; }
         public string TemperatureCelsius { get; set; }
         public string TemperatureFahrenheit { get; set; }
         public string HumidityPercentage { get; set; }

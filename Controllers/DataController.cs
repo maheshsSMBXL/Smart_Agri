@@ -321,6 +321,7 @@ namespace Agri_Smart.Controllers
                 var sensorLatestDat = new SensorDataOutPut
                 {
                     TenantId = device.TenantId,
+                    DeviceName = device.DeviceName,
                     TemperatureCelsius = latestValues.ContainsKey("temperature_celsius") ? FormatDouble(latestValues["temperature_celsius"]["_value"]) : null,
                     TemperatureFahrenheit = latestValues.ContainsKey("temperature_fahrenheit") ? FormatDouble(latestValues["temperature_fahrenheit"]["_value"]) : null,
                     HumidityPercentage = latestValues.ContainsKey("humidity_percentage") ? FormatDouble(latestValues["humidity_percentage"]["_value"]) : null,
@@ -505,6 +506,19 @@ namespace Agri_Smart.Controllers
             }
 
             return Ok();
+        }
+        [HttpPost]
+        [Route("UpdateDeviceName")]
+        public async Task<IActionResult> UpdateDeviceName([FromBody] DeviceName request)
+        {
+            var mobileNumber = User?.Claims?.FirstOrDefault(c => c.Type == "MobileNumber")?.Value;
+            var userInfo = await _dbcontext.UserInfo.FirstOrDefaultAsync(a => a.PhoneNumber == mobileNumber);
+
+            var deviceData = await _dbcontext.Devices.FirstOrDefaultAsync(a => a.PhoneNumber == userInfo.PhoneNumber && a.TenantId == request.TenantId);
+            deviceData.DeviceName = request.Name;
+            _dbcontext.SaveChanges();
+            return Ok(new { Status = "Success", Message = "Device name updated successfully." });
+
         }
 
         //public IActionResult Index()

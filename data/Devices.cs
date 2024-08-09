@@ -10,5 +10,6 @@ namespace Agri_Smart.data
         public string? PhoneNumber { get; set; }
         public string? MacId { get; set; }
         public string? TenantId { get; set; }
+        public string? DeviceName { get; set; }
     }
 }
