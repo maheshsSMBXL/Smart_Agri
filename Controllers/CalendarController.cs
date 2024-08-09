@@ -96,5 +96,19 @@ namespace Agri_Smart.Controllers
 
             return Ok(calendarEvents);
         }
+        [HttpDelete("DeleteCalendarEvent/{EventId}")]
+        public async Task<IActionResult> DeleteCalendarEvent(Guid EventId)
+        {
+            var mobileNumber = User?.Claims?.FirstOrDefault(c => c.Type == "MobileNumber")?.Value;
+            var userInfo = await _dbcontext.UserInfo.FirstOrDefaultAsync(a => a.PhoneNumber == mobileNumber);
+
+            var calendarEvent = await _dbcontext.UserCalendarEvents.FirstOrDefaultAsync(a => a.EventID == EventId);
+            if (calendarEvent != null)
+            {
+                _dbcontext.UserCalendarEvents.Remove(calendarEvent);
+                _dbcontext.SaveChanges();
+            }
+            return Ok(new { Status = "Success", message = "Event deleted successfully" });            
+        }
     }
 }
