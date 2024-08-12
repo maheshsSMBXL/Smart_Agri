@@ -523,14 +523,14 @@ namespace Agri_Smart.Controllers
                         .Select(g => new
                         {
                             Week = g.Key,
-                            AvgTemperature = g.Average(x => x.avg_temperature) ?? 0,
-                            AvgTemperatureF = g.Average(x => x.avg_temperatureF) ?? 0,
-                            AvgHumidity = g.Average(x => x.avg_humidity) ?? 0,
-                            AvgSoilMoistureValue = g.Average(x => x.avg_soilMoistureValue) ?? 0,
-                            AvgSoilMoisturePercent = g.Average(x => x.avg_soilMoisturePercent) ?? 0,
-                            AvgNitrogen = g.Average(x => x.avg_nitrogen) ?? 0,
-                            AvgPhosphorous = g.Average(x => x.avg_phosphorous) ?? 0,
-                            AvgPotassium = g.Average(x => x.avg_potassium) ?? 0
+                            AvgTemperature = g.Average(x => x.avg_temperature).ToString() ?? "0.00",
+                            AvgTemperatureF = g.Average(x => x.avg_temperatureF).ToString() ?? "0.00",
+                            AvgHumidity = g.Average(x => x.avg_humidity).ToString() ?? "0.00",
+                            AvgSoilMoistureValue = g.Average(x => x.avg_soilMoistureValue).ToString() ?? "0.00",
+                            AvgSoilMoisturePercent = g.Average(x => x.avg_soilMoisturePercent).ToString() ?? "0.00",
+                            AvgNitrogen = g.Average(x => x.avg_nitrogen).ToString() ?? "0.00",
+                            AvgPhosphorous = g.Average(x => x.avg_phosphorous).ToString() ?? "0.00",
+                            AvgPotassium = g.Average(x => x.avg_potassium).ToString() ?? "0.00"
                         })
                         .ToDictionary(x => x.Week); // Convert to dictionary for easy lookup
 
@@ -539,14 +539,14 @@ namespace Agri_Smart.Controllers
                         .Select(week => new
                         {
                             Week = week,
-                            AvgTemperature = monthlyData.ContainsKey(week) ? monthlyData[week].AvgTemperature : 0,
-                            AvgTemperatureF = monthlyData.ContainsKey(week) ? monthlyData[week].AvgTemperatureF : 0,
-                            AvgHumidity = monthlyData.ContainsKey(week) ? monthlyData[week].AvgHumidity : 0,
-                            AvgSoilMoistureValue = monthlyData.ContainsKey(week) ? monthlyData[week].AvgSoilMoistureValue : 0,
-                            AvgSoilMoisturePercent = monthlyData.ContainsKey(week) ? monthlyData[week].AvgSoilMoisturePercent : 0,
-                            AvgNitrogen = monthlyData.ContainsKey(week) ? monthlyData[week].AvgNitrogen : 0,
-                            AvgPhosphorous = monthlyData.ContainsKey(week) ? monthlyData[week].AvgPhosphorous : 0,
-                            AvgPotassium = monthlyData.ContainsKey(week) ? monthlyData[week].AvgPotassium : 0
+                            AvgTemperature = monthlyData.ContainsKey(week) ? monthlyData[week].AvgTemperature : "0.00",
+                            AvgTemperatureF = monthlyData.ContainsKey(week) ? monthlyData[week].AvgTemperatureF : "0.00",
+                            AvgHumidity = monthlyData.ContainsKey(week) ? monthlyData[week].AvgHumidity : "0.00",
+                            AvgSoilMoistureValue = monthlyData.ContainsKey(week) ? monthlyData[week].AvgSoilMoistureValue : "0.00",
+                            AvgSoilMoisturePercent = monthlyData.ContainsKey(week) ? monthlyData[week].AvgSoilMoisturePercent : "0.00",
+                            AvgNitrogen = monthlyData.ContainsKey(week) ? monthlyData[week].AvgNitrogen : "0.00",
+                            AvgPhosphorous = monthlyData.ContainsKey(week) ? monthlyData[week].AvgPhosphorous : "0.00",
+                            AvgPotassium = monthlyData.ContainsKey(week) ? monthlyData[week].AvgPotassium : "0.00"
                         })
                         .ToList();
 
