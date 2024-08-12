@@ -154,8 +154,8 @@ namespace Agri_Smart.Controllers
             return tokenHandler.WriteToken(token);
         }
         [Authorize]
-        [HttpDelete("DeleteUser")]
-        public async Task<IActionResult> DeleteUser()
+        [HttpDelete("DeleteUser/{Reason}")]
+        public async Task<IActionResult> DeleteUser(string Reason)
         {
             // Get the mobile number from the claims
             var mobileNumber = User?.Claims?.FirstOrDefault(c => c.Type == "MobileNumber")?.Value;
@@ -179,6 +179,17 @@ namespace Agri_Smart.Controllers
                 if (userInfo != null)
                 {
                     _dbcontext.UserInfo.Remove(userInfo);
+                    _dbcontext.SaveChanges();
+
+                    var deletedUser = new DeletedUsers();
+                    deletedUser.Id = Guid.NewGuid();
+                    deletedUser.PhoneNumber = mobileNumber;
+                    deletedUser.Name = userInfo.Name;
+                    deletedUser.Email = userInfo.Email;
+                    deletedUser.Reason = Reason;
+                    deletedUser.UserCreatedDate = userInfo.UserCreatedDate;
+                    deletedUser.UserDeletedDate = DateTime.Now;
+                    _dbcontext.DeletedUsers.Add(deletedUser);
                     _dbcontext.SaveChanges();
                 }
                 return Ok(new { message = "User deleted successfully" });
