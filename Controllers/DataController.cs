@@ -506,12 +506,16 @@ namespace Agri_Smart.Controllers
 
                     // Query sensor data for the month
                     query = _dbcontext.sensorsavgdata
-                        .Where(data => 
+                        .Where(data =>
                         //data.macAddress == macId && 
                         data.window_start >= startDate && data.window_start <= endDate);
 
-                    // Retrieve the data and process in-memory
+                    // Retrieve the data
                     var monthlyDataRaw = await query.ToListAsync();
+
+                    // Determine the number of weeks in the month
+                    var firstWeekOfMonth = startDate.Day <= 7 ? 1 : 2; // The first week of the month is either week 1 or week 2
+                    var totalWeeks = (int)Math.Ceiling((endDate.Day / 7.0));
 
                     // Group by week number within the month
                     var monthlyData = monthlyDataRaw
@@ -527,9 +531,26 @@ namespace Agri_Smart.Controllers
                             AvgNitrogen = g.Average(x => x.avg_nitrogen) ?? 0,
                             AvgPhosphorous = g.Average(x => x.avg_phosphorous) ?? 0,
                             AvgPotassium = g.Average(x => x.avg_potassium) ?? 0
-                        }).ToList();
+                        })
+                        .ToDictionary(x => x.Week); // Convert to dictionary for easy lookup
 
-                    return Ok(monthlyData);
+                    // Generate placeholder data for all weeks
+                    var result = Enumerable.Range(1, totalWeeks)
+                        .Select(week => new
+                        {
+                            Week = week,
+                            AvgTemperature = monthlyData.ContainsKey(week) ? monthlyData[week].AvgTemperature : 0,
+                            AvgTemperatureF = monthlyData.ContainsKey(week) ? monthlyData[week].AvgTemperatureF : 0,
+                            AvgHumidity = monthlyData.ContainsKey(week) ? monthlyData[week].AvgHumidity : 0,
+                            AvgSoilMoistureValue = monthlyData.ContainsKey(week) ? monthlyData[week].AvgSoilMoistureValue : 0,
+                            AvgSoilMoisturePercent = monthlyData.ContainsKey(week) ? monthlyData[week].AvgSoilMoisturePercent : 0,
+                            AvgNitrogen = monthlyData.ContainsKey(week) ? monthlyData[week].AvgNitrogen : 0,
+                            AvgPhosphorous = monthlyData.ContainsKey(week) ? monthlyData[week].AvgPhosphorous : 0,
+                            AvgPotassium = monthlyData.ContainsKey(week) ? monthlyData[week].AvgPotassium : 0
+                        })
+                        .ToList();
+
+                    return Ok(result);
 
                 default:
                     return BadRequest(new { message = "Invalid period specified. Use 'week' or 'month'." });
