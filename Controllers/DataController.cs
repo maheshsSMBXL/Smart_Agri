@@ -571,7 +571,7 @@ namespace Agri_Smart.Controllers
         [Route("SaveOnBoardData")]
         public async Task<IActionResult> SaveOnBoardData([FromBody] UserInfo request)
         {
-            request.UserCreatedDate = DateTime.Now;
+            request.UserCreatedDate = DateTime.UtcNow;
             await _dbcontext.UserInfo.AddAsync(request);
             _dbcontext.SaveChanges();
 

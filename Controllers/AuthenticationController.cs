@@ -167,7 +167,7 @@ namespace Agri_Smart.Controllers
 
             if (user == null)
             {
-                return NotFound(new { message = "User not found" });
+                return NotFound(new { Status = "Error", message = "User not found" });
             }
 
             // Attempt to delete the user
@@ -179,7 +179,6 @@ namespace Agri_Smart.Controllers
                 if (userInfo != null)
                 {
                     _dbcontext.UserInfo.Remove(userInfo);
-                    _dbcontext.SaveChanges();
 
                     var deletedUser = new DeletedUsers();
                     deletedUser.Id = Guid.NewGuid();
@@ -188,11 +187,11 @@ namespace Agri_Smart.Controllers
                     deletedUser.Email = userInfo.Email;
                     deletedUser.Reason = Reason;
                     deletedUser.UserCreatedDate = userInfo.UserCreatedDate;
-                    deletedUser.UserDeletedDate = DateTime.Now;
+                    deletedUser.UserDeletedDate = DateTime.UtcNow;
                     _dbcontext.DeletedUsers.Add(deletedUser);
                     _dbcontext.SaveChanges();
                 }
-                return Ok(new { message = "User deleted successfully" });
+                return Ok(new { Status = "Success", message = "User deleted successfully" });
             }
 
             // If deletion fails, return a failure response
