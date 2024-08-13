@@ -660,6 +660,8 @@ namespace Agri_Smart.Controllers
                     {
                         Id = ad.Id,
                         DetailType = ad.DetailType,
+                        CoffeeType = ad.CoffeeType,
+                        PlantingPhase = ad.PlantingPhase,
                         Description = ad.Description
                     }).ToList()
                 }).ToList();

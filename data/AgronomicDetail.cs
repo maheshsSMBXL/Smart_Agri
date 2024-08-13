@@ -6,7 +6,9 @@ namespace Agri_Smart.data
     {
         [Key]
         public Guid Id { get; set; }
-        public string? DetailType { get; set; } 
+        public string? DetailType { get; set; }
+        public string? CoffeeType { get; set; }
+        public string? PlantingPhase { get; set; }
         public List<string>? Description { get; set; } 
 
         // Foreign Key

@@ -151,6 +151,8 @@ namespace Agri_Smart.Controllers
                         {
                             Id = Guid.NewGuid(),
                             DetailType = agronomicDetail.DetailType,
+                            CoffeeType = agronomicDetail.CoffeeType,
+                            PlantingPhase = agronomicDetail.PlantingPhase,
                             Description = agronomicDetail.Description,
                             AgronomicPracticeId = agronomicPracticeId
                         });

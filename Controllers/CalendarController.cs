@@ -41,7 +41,7 @@ namespace Agri_Smart.Controllers
             {
                 userCalendarEvents.UserID = userInfo.Id;
                 userCalendarEvents.EventID = Guid.NewGuid();
-                userCalendarEvents.CreatedDate = new DateTime();
+                userCalendarEvents.CreatedDate = DateTime.UtcNow;
 
                 await _dbcontext.UserCalendarEvents.AddAsync(userCalendarEvents);
                 _dbcontext.SaveChanges();
@@ -55,7 +55,7 @@ namespace Agri_Smart.Controllers
                 _dbcontext.UserCalendarEvents.RemoveRange(calendarEvents);
 
                 userCalendarEvents.UserID = userInfo.Id;
-                userCalendarEvents.CreatedDate = new DateTime();
+                userCalendarEvents.CreatedDate = DateTime.UtcNow;
 
                 await _dbcontext.UserCalendarEvents.AddAsync(userCalendarEvents);
                 _dbcontext.SaveChanges();
