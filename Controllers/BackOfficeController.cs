@@ -128,6 +128,43 @@ namespace Agri_Smart.Controllers
 
             return Ok(new { Status = "Success", Message = "Data saved successfully." });
         }
+        [HttpPost("SaveAgronomicPractice")]
+        public async Task<ActionResult<AgronomicPractice>> SaveAgronomicPractice(List<AgronomicPractice> agronomicPractices)
+        {
+            foreach (var agronomicPracticeItem in agronomicPractices)
+            {
+                var agronomicPracticeId = Guid.NewGuid();
+                var agronomicPractice = new AgronomicPractice
+                {
+                    Id = agronomicPracticeId,
+                    Name = agronomicPracticeItem.Name,
+                    Description = agronomicPracticeItem.Description,
+                    AgronomicDetails = new List<AgronomicDetail>() // Initialize the list here
+                };
+
+                if (agronomicPracticeItem.AgronomicDetails != null)
+                {
+                    foreach (var agronomicDetail in agronomicPracticeItem.AgronomicDetails)
+                    {
+                        // Add related details
+                        agronomicPractice.AgronomicDetails.Add(new AgronomicDetail
+                        {
+                            Id = Guid.NewGuid(),
+                            DetailType = agronomicDetail.DetailType,
+                            Description = agronomicDetail.Description,
+                            AgronomicPracticeId = agronomicPracticeId
+                        });
+                    }
+                }
+
+                _dbcontext.AgronomicPractice.Add(agronomicPractice);
+            }
+
+            _dbcontext.SaveChanges(); // Save changes outside the loop for better performance
+
+            return Ok("Data inserted successfully.");
+        }
+
 
     }
 }

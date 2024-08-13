@@ -641,10 +641,40 @@ namespace Agri_Smart.Controllers
             return Ok(new { Status = "Success", Message = "Device name updated successfully." });
 
         }
+        [AllowAnonymous]
+        [HttpGet("GetAgronomicPractices")]
+        public async Task<ActionResult<IEnumerable<AgronomicPracticeDto>>> GetAgronomicPractices()
+        {
+            try
+            {
+                var agronomicPractices = await _dbcontext.AgronomicPractice
+                    .Include(ap => ap.AgronomicDetails)
+                    .ToListAsync();
 
-        //public IActionResult Index()
-        //{
-        //    return View();
-        //}
+                var agronomicPracticesDto = agronomicPractices.Select(ap => new AgronomicPracticeDto
+                {
+                    Id = ap.Id,
+                    Name = ap.Name,
+                    Description = ap.Description,
+                    AgronomicDetails = ap.AgronomicDetails?.Select(ad => new AgronomicDetailDto
+                    {
+                        Id = ad.Id,
+                        DetailType = ad.DetailType,
+                        Description = ad.Description
+                    }).ToList()
+                }).ToList();
+
+                if (!agronomicPracticesDto.Any())
+                {
+                    return NotFound("No agronomic practices found.");
+                }
+
+                return Ok(agronomicPracticesDto);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "An error occurred while processing your request.");
+            }
+        }
     }
 }

@@ -35,6 +35,8 @@ namespace Agri_Smart.data
         public DbSet<UserCalendarEvents> UserCalendarEvents { get; set; }
         public DbSet<sensorsavgdata> sensorsavgdata { get; set; }
         public DbSet<DeletedUsers> DeletedUsers { get; set; }
+        public DbSet<AgronomicPractice> AgronomicPractice { get; set; }
+        public DbSet<AgronomicDetail> AgronomicDetail { get; set; }
 
         public override int SaveChanges()
         {
