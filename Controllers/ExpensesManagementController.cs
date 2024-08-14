@@ -380,7 +380,7 @@ namespace Agri_Smart.Controllers
             var customerRevenues = await _dbcontext.CustomerRevenue.Where(a => a.ActivityId == request.ActivityId).ToListAsync();
 
             _dbcontext.CustomerRevenue.RemoveRange(customerRevenues);
-            if (request.RevenueDetails != null) 
+            if (request.RevenueDetails != null && request.RevenueDetails.Count != 0) 
             {
                 foreach (var req in request.RevenueDetails)
                 {
@@ -401,7 +401,7 @@ namespace Agri_Smart.Controllers
                 }
                 return Ok(new { Status = "Success", Message = "Data Saved Successfully." });
             }
-            if (request.HarvestedAndSold != null)
+            if (request.HarvestedAndSold != null && request.HarvestedAndSold.Count != 0)
             {
                 foreach (var req in request.HarvestedAndSold)
                 {
