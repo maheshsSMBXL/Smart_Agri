@@ -678,5 +678,50 @@ namespace Agri_Smart.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError, "An error occurred while processing your request.");
             }
         }
+        [AllowAnonymous]
+        [HttpPost("CalculateYield")]
+        public IActionResult CalculateYield([FromBody] YieldInput input)
+        {
+            double baselineYield = 0.0;
+            double adjustmentFactor = 1.0;
+
+            // Determine baseline yield based on coffee variant
+            if (input.CoffeeVariant.ToLower() == "robusta")
+            {
+                baselineYield = 0.8 * input.Area; // Robusta: 0.8 tons/acre
+            }
+            else if (input.CoffeeVariant.ToLower() == "arabica")
+            {
+                baselineYield = 1.0 * input.Area; // Arabica: 1.0 tons/acre
+            }
+
+            // Apply adjustments based on real-time data
+
+            // Soil Moisture Adjustment
+            if (input.CoffeeVariant.ToLower() == "arabica" && input.SoilMoisture < 70)
+            {
+                adjustmentFactor *= 0.95; // 5% reduction for Arabica
+            }
+
+            // Temperature Adjustment
+            if (input.CoffeeVariant.ToLower() == "arabica" && input.Temperature > 26)
+            {
+                adjustmentFactor *= 0.95; // 5% reduction for Arabica
+            }
+            else if (input.CoffeeVariant.ToLower() == "robusta" && input.Temperature > 28)
+            {
+                adjustmentFactor *= 0.95; // 5% reduction for Robusta if temperature exceeds 28°C
+            }
+
+            // Rainfall Adjustment
+            adjustmentFactor *= 0.90; // 10% reduction for below-average rainfall (applies to both)
+
+            // Pest Presence Adjustment
+            adjustmentFactor *= (1 - (input.PestPresence / 100));
+
+            // Calculate final yield
+            double finalYield = baselineYield * adjustmentFactor;
+            return Ok(finalYield);
+        }
     }
 }
