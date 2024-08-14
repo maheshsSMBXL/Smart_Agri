@@ -14,5 +14,6 @@ namespace Agri_Smart.data
         public double? Rainfall { get; set; }
         public double? PestPresence { get; set; }
         public double? FinalEstimatedYield { get; set; }
+        public DateTime? CreatedDate { get; set; }
     }
 }

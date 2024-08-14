@@ -690,6 +690,8 @@ namespace Agri_Smart.Controllers
             }
 
             var estimtedYield = new EstimatedYield();
+
+            estimtedYield.Id = Guid.NewGuid();
             estimtedYield.UserId = userInfo.Id;
             estimtedYield.CoffeeVariant = input.CoffeeVariant;
             estimtedYield.Area = input.Area;
@@ -698,6 +700,7 @@ namespace Agri_Smart.Controllers
             estimtedYield.Rainfall = input.Rainfall;
             estimtedYield.PestPresence = input.PestPresence;
             estimtedYield.FinalEstimatedYield = input.EstimatedYield;
+            estimtedYield.CreatedDate = DateTime.UtcNow;
 
             await _dbcontext.EstimatedYield.AddAsync(estimtedYield);
             _dbcontext.SaveChanges();

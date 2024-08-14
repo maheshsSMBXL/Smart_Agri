@@ -167,6 +167,27 @@ namespace Agri_Smart.Controllers
             return Ok("Data inserted successfully.");
         }
 
+        [HttpPost]
+        [Route("MapTransmitterWithReceiver")]
+        public async Task<IActionResult> MapTransmitterWithReceiver([FromBody] MapTransmitterWithReceiverRequest request)
+        {
+
+            var transmitters = new Transmitters();
+
+            foreach (var Transmitter in request.TransmitterMacIds)
+            {
+                transmitters.Id = Guid.NewGuid();
+                transmitters.TransmitterMacId = Transmitter;
+                transmitters.ReceiverMacId = request.ReceiverMacId;
+                transmitters.MappedDate = DateTime.UtcNow;
+
+                await _dbcontext.Transmitters.AddAsync(transmitters);
+                _dbcontext.SaveChanges();
+            }           
+
+            return Ok(new { Status = "Success", Message = "Transmitters mapped with receivers successfully." });
+        }
+
 
     }
 }

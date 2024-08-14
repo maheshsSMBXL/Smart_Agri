@@ -29,6 +29,7 @@ namespace Agri_Smart.data
         DbSet<AgronomicPractice> AgronomicPractice { get; set; }
         DbSet<AgronomicDetail> AgronomicDetail { get; set; }
         DbSet<EstimatedYield> EstimatedYield { get; set; }
+        DbSet<Transmitters> Transmitters { get; set; }
 
         int SaveChanges();
         DataTable ExecuteReader
