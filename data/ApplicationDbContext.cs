@@ -37,6 +37,7 @@ namespace Agri_Smart.data
         public DbSet<DeletedUsers> DeletedUsers { get; set; }
         public DbSet<AgronomicPractice> AgronomicPractice { get; set; }
         public DbSet<AgronomicDetail> AgronomicDetail { get; set; }
+        public DbSet<EstimatedYield> EstimatedYield { get; set; }
 
         public override int SaveChanges()
         {

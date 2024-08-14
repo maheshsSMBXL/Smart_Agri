@@ -678,50 +678,30 @@ namespace Agri_Smart.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError, "An error occurred while processing your request.");
             }
         }
-        [AllowAnonymous]
-        [HttpPost("CalculateYield")]
-        public IActionResult CalculateYield([FromBody] YieldInput input)
+        [HttpPost("SaveEstimatedYield")]
+        public async Task<IActionResult> SaveEstimatedYield([FromBody] YieldInput input)
         {
-            double baselineYield = 0.0;
-            double adjustmentFactor = 1.0;
+            var mobileNumber = User?.Claims?.FirstOrDefault(c => c.Type == "MobileNumber")?.Value;
+            var userInfo = _dbcontext.UserInfo.FirstOrDefault(a => a.PhoneNumber == mobileNumber);
 
-            // Determine baseline yield based on coffee variant
-            if (input.CoffeeVariant.ToLower() == "robusta")
+            if (userInfo == null)
             {
-                baselineYield = 0.8 * input.Area; // Robusta: 0.8 tons/acre
-            }
-            else if (input.CoffeeVariant.ToLower() == "arabica")
-            {
-                baselineYield = 1.0 * input.Area; // Arabica: 1.0 tons/acre
+                return NotFound(new { Status = "Error", message = "User not found" });
             }
 
-            // Apply adjustments based on real-time data
+            var estimtedYield = new EstimatedYield();
+            estimtedYield.UserId = userInfo.Id;
+            estimtedYield.CoffeeVariant = input.CoffeeVariant;
+            estimtedYield.Area = input.Area;
+            estimtedYield.SoilMoisture = input.SoilMoisture;
+            estimtedYield.Temperature = input.Temperature;
+            estimtedYield.Rainfall = input.Rainfall;
+            estimtedYield.PestPresence = input.PestPresence;
+            estimtedYield.FinalEstimatedYield = input.EstimatedYield;
 
-            // Soil Moisture Adjustment
-            if (input.CoffeeVariant.ToLower() == "arabica" && input.SoilMoisture < 70)
-            {
-                adjustmentFactor *= 0.95; // 5% reduction for Arabica
-            }
-
-            // Temperature Adjustment
-            if (input.CoffeeVariant.ToLower() == "arabica" && input.Temperature > 26)
-            {
-                adjustmentFactor *= 0.95; // 5% reduction for Arabica
-            }
-            else if (input.CoffeeVariant.ToLower() == "robusta" && input.Temperature > 28)
-            {
-                adjustmentFactor *= 0.95; // 5% reduction for Robusta if temperature exceeds 28°C
-            }
-
-            // Rainfall Adjustment
-            adjustmentFactor *= 0.90; // 10% reduction for below-average rainfall (applies to both)
-
-            // Pest Presence Adjustment
-            adjustmentFactor *= (1 - (input.PestPresence / 100));
-
-            // Calculate final yield
-            double finalYield = baselineYield * adjustmentFactor;
-            return Ok(finalYield);
+            await _dbcontext.EstimatedYield.AddAsync(estimtedYield);
+            _dbcontext.SaveChanges();
+            return Ok(new { Status = "Success", Message = "Device name updated successfully." });
         }
     }
 }

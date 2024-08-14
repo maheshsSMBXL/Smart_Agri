@@ -28,6 +28,7 @@ namespace Agri_Smart.data
         DbSet<DeletedUsers> DeletedUsers { get; set; }
         DbSet<AgronomicPractice> AgronomicPractice { get; set; }
         DbSet<AgronomicDetail> AgronomicDetail { get; set; }
+        DbSet<EstimatedYield> EstimatedYield { get; set; }
 
         int SaveChanges();
         DataTable ExecuteReader
