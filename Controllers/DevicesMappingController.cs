@@ -43,6 +43,8 @@ namespace Agri_Smart.Controllers
             {
                 var tenantId = Guid.NewGuid().ToString();
 
+                device.Id = Guid.NewGuid();
+                device.UserId = userInfo.Id;
                 device.PhoneNumber = mobileNumber;
                 device.MacId = macId.TransmitterMacId;
                 device.TenantId = tenantId;
