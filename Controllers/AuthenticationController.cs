@@ -197,5 +197,40 @@ namespace Agri_Smart.Controllers
             // If deletion fails, return a failure response
             return StatusCode(500, new { message = "Error deleting user", errors = result.Errors });
         }
+        [Authorize]
+        [HttpPost]
+        [Route("RegisterUspDevice")]
+        public async Task<IActionResult> RegisterUspDevice([FromBody] DeviceMacAddress request)
+        {
+            var mobileNumber = User?.Claims?.FirstOrDefault(c => c.Type == "MobileNumber")?.Value;
+
+            var userInfo = await _dbcontext.UserInfo.FirstOrDefaultAsync(a => a.PhoneNumber == mobileNumber);
+
+            if (request.OldMacId == null)
+            {
+                var tenantId = Guid.NewGuid().ToString();
+                var device = new Devices();
+                device.PhoneNumber = mobileNumber;
+                device.MacId = request.NewMacId;
+                device.TenantId = tenantId;
+                await _dbcontext.Devices.AddAsync(device);
+                _dbcontext.SaveChanges();
+
+                return Ok(new { Status = "Success", Message = "Device mapped with user successfully." });
+            }
+            else
+            {
+                var device = await _dbcontext.Devices.FirstOrDefaultAsync(a => a.MacId == request.OldMacId && a.PhoneNumber == mobileNumber);
+                if (device != null)
+                {
+                    device.MacId = request.NewMacId;
+                    _dbcontext.SaveChanges();
+
+                    return Ok(new { Status = "Success", Message = "Old device replaced with new device successfully." });
+                }
+            }
+            return Ok(new { Status = "Failed" });
+
+        }
     }
 }
