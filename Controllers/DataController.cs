@@ -656,6 +656,7 @@ namespace Agri_Smart.Controllers
                     Id = ap.Id,
                     Name = ap.Name,
                     Description = ap.Description,
+                    Image = ap.Image,
                     AgronomicDetails = ap.AgronomicDetails?.Select(ad => new AgronomicDetailDto
                     {
                         Id = ad.Id,

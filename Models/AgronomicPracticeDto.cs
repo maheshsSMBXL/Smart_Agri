@@ -5,6 +5,7 @@
         public Guid Id { get; set; }
         public string? Name { get; set; }
         public List<string>? Description { get; set; }
+        public string? Image { get; set; }
         public List<AgronomicDetailDto>? AgronomicDetails { get; set; }
     }
     public class AgronomicDetailDto
