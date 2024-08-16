@@ -23,6 +23,7 @@ namespace Agri_Smart.Controllers
         [Route("RegisterUspDevice")]
         public async Task<IActionResult> RegisterUspDevice([FromBody] RegisterDeviceInput request)
         {
+            var userInfo = _dbcontext.UserInfo.FirstOrDefault(a => a.PhoneNumber == request.PhoneNumber);
             if (request.OldMacId == null)
             {
                 var tenantId = Guid.NewGuid().ToString();
@@ -31,6 +32,7 @@ namespace Agri_Smart.Controllers
                 device.MacId = request.NewMacId;
                 device.TenantId = tenantId;
                 await _dbcontext.Devices.AddAsync(device);
+                userInfo.DeviceStatus = true;
                 _dbcontext.SaveChanges();
 
                 return Ok(new { Status = "Success", Message = "Device mapped with user successfully." });

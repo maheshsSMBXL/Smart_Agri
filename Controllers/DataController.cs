@@ -248,14 +248,14 @@ namespace Agri_Smart.Controllers
 
             var result = new
             {
-                TemperatureCelsius = latestValues.ContainsKey("temperature_celsius") ? FormatDouble(latestValues["temperature_celsius"]["_value"]) : null,
-                TemperatureFahrenheit = latestValues.ContainsKey("temperature_fahrenheit") ? FormatDouble(latestValues["temperature_fahrenheit"]["_value"]) : null,
-                HumidityPercentage = latestValues.ContainsKey("humidity_percentage") ? FormatDouble(latestValues["humidity_percentage"]["_value"]) : null,
-                Moisture = latestValues.ContainsKey("moisture") ? FormatDouble(latestValues["moisture"]["_value"]) : null,
-                MoisturePercentage = latestValues.ContainsKey("moisture_percentage") ? FormatDouble(latestValues["moisture_percentage"]["_value"]) : null,
-                Nitrogen = latestValues.ContainsKey("nitrogen") ? FormatDouble(latestValues["nitrogen"]["_value"]) : null,
-                Phosphorus = latestValues.ContainsKey("phosphorus") ? FormatDouble(latestValues["phosphorus"]["_value"]) : null,
-                Potassium = latestValues.ContainsKey("potassium") ? FormatDouble(latestValues["potassium"]["_value"]) : null
+                TemperatureCelsius = latestValues.ContainsKey("temperature_celsius") ? FormatDouble(latestValues["temperature_celsius"]["_value"]) : "",
+                TemperatureFahrenheit = latestValues.ContainsKey("temperature_fahrenheit") ? FormatDouble(latestValues["temperature_fahrenheit"]["_value"]) : "",
+                HumidityPercentage = latestValues.ContainsKey("humidity_percentage") ? FormatDouble(latestValues["humidity_percentage"]["_value"]) : "",
+                Moisture = latestValues.ContainsKey("moisture") ? FormatDouble(latestValues["moisture"]["_value"]) : "",
+                MoisturePercentage = latestValues.ContainsKey("moisture_percentage") ? FormatDouble(latestValues["moisture_percentage"]["_value"]) : "",
+                Nitrogen = latestValues.ContainsKey("nitrogen") ? FormatDouble(latestValues["nitrogen"]["_value"]) : "",
+                Phosphorus = latestValues.ContainsKey("phosphorus") ? FormatDouble(latestValues["phosphorus"]["_value"]) : "",
+                Potassium = latestValues.ContainsKey("potassium") ? FormatDouble(latestValues["potassium"]["_value"]) : ""
             };
 
             return Ok(result);

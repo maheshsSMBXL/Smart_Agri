@@ -50,6 +50,7 @@ namespace Agri_Smart.Controllers
                 device.TenantId = tenantId;
 
                 await _dbcontext.Devices.AddAsync(device);
+                userInfo.DeviceStatus = true;
                 _dbcontext.SaveChanges();
             }            
 
