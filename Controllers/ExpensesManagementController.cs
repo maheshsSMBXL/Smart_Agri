@@ -480,6 +480,7 @@ namespace Agri_Smart.Controllers
             var Workers = await _dbcontext.Workers.Where(w => w.UserId == UserInfo.Id).SumAsync(w => w.TotalCost) ?? 0;
             var Machinery = await _dbcontext.Machineries.Where(w => w.UserId == UserInfo.Id).SumAsync(w => w.TotalCost) ?? 0;
             var OtherExpenses = await _dbcontext.OtherExpenses.Where(w => w.UserId == UserInfo.Id).SumAsync(w => w.TotalCost) ?? 0;
+            var SubExpenses = await _dbcontext.CategorySubExpenses.Where(w => w.UserId == UserInfo.Id).SumAsync(w => w.Cost) ?? 0;
 
             var RevenueDetails = await _dbcontext.CustomerRevenue
                 .Where(w => w.UserID == UserInfo.Id && w.RevenueCategoryName == "Revenue details")
@@ -493,10 +494,10 @@ namespace Agri_Smart.Controllers
             totalRevenueAndExpenses.CategorisedRevenues.RevenueDetails = RevenueDetails;
             totalRevenueAndExpenses.CategorisedRevenues.HarvestedAndSold = HarvestedAndSold;
 
-            totalRevenueAndExpenses.TotalExpenses = (decimal)(Workers + Machinery + Machinery);
+            totalRevenueAndExpenses.TotalExpenses = (decimal)(Workers + Machinery + OtherExpenses + SubExpenses);
             totalRevenueAndExpenses.CategorisedExpenses.Workers = (decimal)Workers;
             totalRevenueAndExpenses.CategorisedExpenses.Machinery = (decimal)Machinery;
-            totalRevenueAndExpenses.CategorisedExpenses.OtherExpenses = (decimal)Machinery;
+            totalRevenueAndExpenses.CategorisedExpenses.OtherExpenses = (decimal)OtherExpenses;
             totalRevenueAndExpenses.Budget = (decimal?)UserInfo?.BudgetAmount;
 
             return Ok(totalRevenueAndExpenses);
