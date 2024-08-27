@@ -39,14 +39,15 @@ namespace Agri_Smart.Controllers
 
             if (userCalendarEvents.EventID == null || userCalendarEvents.EventID == Guid.NewGuid())
             {
+                var EventID = Guid.NewGuid();
                 userCalendarEvents.UserID = userInfo.Id;
-                userCalendarEvents.EventID = Guid.NewGuid();
+                userCalendarEvents.EventID = EventID;
                 userCalendarEvents.CreatedDate = DateTime.UtcNow;
 
                 await _dbcontext.UserCalendarEvents.AddAsync(userCalendarEvents);
                 _dbcontext.SaveChanges();
 
-                return Ok(new { Status = "Success", Message = "Data saved successfully." });
+                return Ok(new { Status = "Success", Message = "Data saved successfully.", EventID = EventID.ToString() });
             }
             else 
             {
@@ -60,7 +61,7 @@ namespace Agri_Smart.Controllers
                 await _dbcontext.UserCalendarEvents.AddAsync(userCalendarEvents);
                 _dbcontext.SaveChanges();
 
-                return Ok(new { Status = "Success", Message = "Data Updated Successfully." });
+                return Ok(new { Status = "Success", Message = "Data Updated Successfully.", EventID = userCalendarEvents.EventID.ToString() });
 
             }
             return Ok();
