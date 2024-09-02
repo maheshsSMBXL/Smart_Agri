@@ -7,6 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="FirebaseAdmin" Version="3.0.0" />
     <PackageReference Include="InfluxDB.Client" Version="4.16.0" />
     <PackageReference Include="Microsoft.AspNet.WebApi.Client" Version="6.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="6.0.0" />
@@ -25,6 +26,7 @@
 
   <ItemGroup>
     <Folder Include="Migrations\" />
+    <Folder Include="Files\" />
   </ItemGroup>
 
   <ItemGroup>

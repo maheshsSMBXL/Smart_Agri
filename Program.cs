@@ -15,6 +15,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 builder.Services.AddSingleton<SmsService>();
+builder.Services.AddSingleton<PushNotificationService>();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -79,6 +80,8 @@ builder.Services.AddHttpClient<FlaskApiService>(client =>
 {
     client.BaseAddress = new Uri("http://192.168.1.174:5001"); // Your Flask API base address
 });
+
+builder.Services.AddHostedService<Jobs>();
 
 var app = builder.Build();
 
