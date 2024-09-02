@@ -27,7 +27,7 @@ namespace Agri_Smart.Services
         {
             var registrationTokens = new List<string>
         {            
-            "fsPF7zC-TD6y4LLYFl0pov:APA91bEHa5FrhvZSEe5IpNMldfLyqhJuG0Riu9p0122jfkVekFFY5TOS_szo2TMJ-YIVgCljppMDXeDNZ8qN8ngQzNtb_zhgRPy1ieS2X1K1yjZu7w3MQrUXk715gwcQrQi9z46eazwe",
+            //"fsPF7zC-TD6y4LLYFl0pov:APA91bEHa5FrhvZSEe5IpNMldfLyqhJuG0Riu9p0122jfkVekFFY5TOS_szo2TMJ-YIVgCljppMDXeDNZ8qN8ngQzNtb_zhgRPy1ieS2X1K1yjZu7w3MQrUXk715gwcQrQi9z46eazwe",
             // "capmArQ6QVq3YIsLW77u6v:APA91bFhgfnObXxc7VQ9uFnlnLwtPCg-w8iW1IvsB2KMuX6BLGleVFol_SYKGTYsyEo2bVZ_1I6atd5KcOTaO1u-tDtGVEFm0orCZdLBGOcpWbYnlggdrdo2qRZZCA2QAZ7uYzUAKURI",
         };
 
