@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.Authorization;
 using System.IdentityModel.Tokens.Jwt;
 using InfluxDB.Client.Writes;
 using System.Globalization;
+using Newtonsoft.Json;
 
 namespace Agri_Smart.Controllers
 {
@@ -498,7 +499,6 @@ namespace Agri_Smart.Controllers
                         }).ToListAsync();
 
                     return Ok(weeklyData);
-
                 case "month":
                     // Calculate the start and end of the current month
                     startDate = new DateTime(now.Year, now.Month, 1, 0, 0, 0, DateTimeKind.Utc); // Ensure UTC
@@ -507,7 +507,6 @@ namespace Agri_Smart.Controllers
                     // Query sensor data for the month
                     query = _dbcontext.sensorsavgdata
                         .Where(data =>
-                        //data.macAddress == macId && 
                         data.window_start >= startDate && data.window_start <= endDate);
 
                     // Retrieve the data
@@ -523,34 +522,45 @@ namespace Agri_Smart.Controllers
                         .Select(g => new
                         {
                             Week = g.Key,
-                            AvgTemperature = g.Average(x => x.avg_temperature).ToString() ?? "0.00",
-                            AvgTemperatureF = g.Average(x => x.avg_temperatureF).ToString() ?? "0.00",
-                            AvgHumidity = g.Average(x => x.avg_humidity).ToString() ?? "0.00",
-                            AvgSoilMoistureValue = g.Average(x => x.avg_soilMoistureValue).ToString() ?? "0.00",
-                            AvgSoilMoisturePercent = g.Average(x => x.avg_soilMoisturePercent).ToString() ?? "0.00",
-                            AvgNitrogen = g.Average(x => x.avg_nitrogen).ToString() ?? "0.00",
-                            AvgPhosphorous = g.Average(x => x.avg_phosphorous).ToString() ?? "0.00",
-                            AvgPotassium = g.Average(x => x.avg_potassium).ToString() ?? "0.00"
+                            AvgTemperature = g.Average(x => x.avg_temperature),
+                            AvgTemperatureF = g.Average(x => x.avg_temperatureF),
+                            AvgHumidity = g.Average(x => x.avg_humidity),
+                            AvgSoilMoistureValue = g.Average(x => x.avg_soilMoistureValue),
+                            AvgSoilMoisturePercent = g.Average(x => x.avg_soilMoisturePercent),
+                            AvgNitrogen = g.Average(x => x.avg_nitrogen),
+                            AvgPhosphorous = g.Average(x => x.avg_phosphorous),
+                            AvgPotassium = g.Average(x => x.avg_potassium)
                         })
                         .ToDictionary(x => x.Week); // Convert to dictionary for easy lookup
 
                     // Generate placeholder data for all weeks
-                    var result = Enumerable.Range(1, totalWeeks)
-                        .Select(week => new
-                        {
-                            Week = week,
-                            AvgTemperature = monthlyData.ContainsKey(week) ? monthlyData[week].AvgTemperature : "0.00",
-                            AvgTemperatureF = monthlyData.ContainsKey(week) ? monthlyData[week].AvgTemperatureF : "0.00",
-                            AvgHumidity = monthlyData.ContainsKey(week) ? monthlyData[week].AvgHumidity : "0.00",
-                            AvgSoilMoistureValue = monthlyData.ContainsKey(week) ? monthlyData[week].AvgSoilMoistureValue : "0.00",
-                            AvgSoilMoisturePercent = monthlyData.ContainsKey(week) ? monthlyData[week].AvgSoilMoisturePercent : "0.00",
-                            AvgNitrogen = monthlyData.ContainsKey(week) ? monthlyData[week].AvgNitrogen : "0.00",
-                            AvgPhosphorous = monthlyData.ContainsKey(week) ? monthlyData[week].AvgPhosphorous : "0.00",
-                            AvgPotassium = monthlyData.ContainsKey(week) ? monthlyData[week].AvgPotassium : "0.00"
-                        })
-                        .ToList();
+                    var jsonSettings = new JsonSerializerSettings
+                    {
+                        FloatFormatHandling = FloatFormatHandling.DefaultValue,
+                        FloatParseHandling = FloatParseHandling.Double,
+                        Formatting = Formatting.Indented
+                    };
 
-                    return Ok(result);
+                    var result = Enumerable.Range(1, totalWeeks)
+       .Select(week => new
+       {
+           Week = week,
+           AvgTemperature = monthlyData.ContainsKey(week) ? monthlyData[week].AvgTemperature : 0.00,
+           AvgTemperatureF = monthlyData.ContainsKey(week) ? monthlyData[week].AvgTemperatureF : 0.00,
+           AvgHumidity = monthlyData.ContainsKey(week) ? monthlyData[week].AvgHumidity : 0.00,
+           AvgSoilMoistureValue = monthlyData.ContainsKey(week) ? monthlyData[week].AvgSoilMoistureValue : 0.00,
+           AvgSoilMoisturePercent = monthlyData.ContainsKey(week) ? monthlyData[week].AvgSoilMoisturePercent : 0.00,
+           AvgNitrogen = monthlyData.ContainsKey(week) ? monthlyData[week].AvgNitrogen : 0.00,
+           AvgPhosphorous = monthlyData.ContainsKey(week) ? monthlyData[week].AvgPhosphorous : 0.00,
+           AvgPotassium = monthlyData.ContainsKey(week) ? monthlyData[week].AvgPotassium : 0.00
+       })
+       .ToList();
+
+                    string FinalResult = JsonConvert.SerializeObject(result, jsonSettings);
+
+
+                    return Ok(FinalResult);
+
 
                 default:
                     return BadRequest(new { message = "Invalid period specified. Use 'week' or 'month'." });
