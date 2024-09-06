@@ -17,7 +17,7 @@
 
         private void DoWork(object state)
         {
-            _pushNotificationService.SendNotificationAsync().GetAwaiter().GetResult();
+            //_pushNotificationService.SendNotificationAsync().GetAwaiter().GetResult();
         }
 
         public Task StopAsync(CancellationToken cancellationToken)

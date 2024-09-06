@@ -1,5 +1,6 @@
 ﻿using Agri_Smart.data;
 using Agri_Smart.Models;
+using Agri_Smart.Services;
 using InfluxDB.Client;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -19,15 +20,17 @@ namespace Agri_Smart.Controllers
         private readonly string _bucket;
         private readonly string _org;
         private readonly IApplicationDbContext _dbcontext;
+        private readonly JsonSerializerSettingsService _jsonSerializerSettingsService;
 
         public CalendarController(UserManager<IdentityUser> context, InfluxDBClient influxDBClient,
-            IConfiguration configuration, IApplicationDbContext dbcontext)
+            IConfiguration configuration, IApplicationDbContext dbcontext, JsonSerializerSettingsService jsonSerializerSettingsService)
         {
             _context = context;
             _influxDBClient = influxDBClient;
             _bucket = configuration["ConnectionStrings:InfluxDBBucket"];
             _org = configuration["ConnectionStrings:InfluxDBOrg"];
             _dbcontext = dbcontext;
+            _jsonSerializerSettingsService = jsonSerializerSettingsService;
         }
 
         [HttpPost]
@@ -95,7 +98,9 @@ namespace Agri_Smart.Controllers
             calendarEvents.CalendarCommonEvents = calendarCommonEvents;
             calendarEvents.UserCalendarEvents = userCalendarEvents;
 
-            return Ok(calendarEvents);
+            var jsonResponse = _jsonSerializerSettingsService.SerializeObject(calendarEvents);
+
+            return Ok(jsonResponse);
         }
         [HttpDelete("DeleteCalendarEvent/{EventId}")]
         public async Task<IActionResult> DeleteCalendarEvent(Guid EventId)

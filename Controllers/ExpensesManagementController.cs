@@ -1,5 +1,6 @@
 ﻿using Agri_Smart.data;
 using Agri_Smart.Models;
+using Agri_Smart.Services;
 using InfluxDB.Client;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -18,15 +19,17 @@ namespace Agri_Smart.Controllers
         private readonly string _bucket;
         private readonly string _org;
         private readonly IApplicationDbContext _dbcontext;
+        private readonly JsonSerializerSettingsService _jsonSerializerSettingsService;
 
         public ExpensesManagementController(UserManager<IdentityUser> context, InfluxDBClient influxDBClient,
-            IConfiguration configuration, IApplicationDbContext dbcontext)
+            IConfiguration configuration, IApplicationDbContext dbcontext, JsonSerializerSettingsService jsonSerializerSettingsService)
         {
             _context = context;
             _influxDBClient = influxDBClient;
             _bucket = configuration["ConnectionStrings:InfluxDBBucket"];
             _org = configuration["ConnectionStrings:InfluxDBOrg"];
             _dbcontext = dbcontext;
+            _jsonSerializerSettingsService = jsonSerializerSettingsService;
         }
         [HttpGet]
         [Route("GetExpensesCategories")]
@@ -61,7 +64,8 @@ namespace Agri_Smart.Controllers
                 }
                 categorySubCategories.Add(categorySubCategory);
             }
-            return Ok(categorySubCategories);            
+            var jsonResponse = _jsonSerializerSettingsService.SerializeObject(categorySubCategories);
+            return Ok(jsonResponse);            
         }
         [HttpPost]
         [Route("SaveExpenses")]
@@ -324,7 +328,8 @@ namespace Agri_Smart.Controllers
 
                 CustomerExpenses.Add(CustomerExpense);
             }
-            return Ok(CustomerExpenses);
+            var jsonResponse = _jsonSerializerSettingsService.SerializeObject(CustomerExpenses);
+            return Ok(jsonResponse);
         }
         [HttpGet]
         [Route("GetRevenueCategories")]
@@ -332,7 +337,8 @@ namespace Agri_Smart.Controllers
         public async Task<IActionResult> GetRevenueCategories()
         {
             var RevenueCategories = await _dbcontext.Revenue.ToListAsync();
-            return Ok(RevenueCategories);
+            var jsonResponse = _jsonSerializerSettingsService.SerializeObject(RevenueCategories);
+            return Ok(jsonResponse);
         }
         [HttpPost]
         [Route("SaveCustomerRevenue")]
@@ -466,7 +472,8 @@ namespace Agri_Smart.Controllers
                 }).ToList()
         }).ToList();
 
-            return Ok(customerRevenuesGrouped);
+            var jsonResponse = _jsonSerializerSettingsService.SerializeObject(customerRevenuesGrouped);
+            return Ok(jsonResponse);
         }
         [HttpGet]
         [Route("GetToatlRevenueAndExpenses")]
@@ -500,7 +507,8 @@ namespace Agri_Smart.Controllers
             totalRevenueAndExpenses.CategorisedExpenses.OtherExpenses = (decimal)OtherExpenses;
             totalRevenueAndExpenses.Budget = (decimal?)UserInfo?.BudgetAmount;
 
-            return Ok(totalRevenueAndExpenses);
+            var jsonResponse = _jsonSerializerSettingsService.SerializeObject(totalRevenueAndExpenses);
+            return Ok(jsonResponse);
         }
         [HttpPost]
         [Route("SaveCustomerBudget")]

@@ -14,6 +14,7 @@ using System.IdentityModel.Tokens.Jwt;
 using InfluxDB.Client.Writes;
 using System.Globalization;
 using Newtonsoft.Json;
+using Agri_Smart.Services;
 
 namespace Agri_Smart.Controllers
 {
@@ -27,15 +28,17 @@ namespace Agri_Smart.Controllers
         private readonly string _bucket;
         private readonly string _org;
         private readonly IApplicationDbContext _dbcontext;
+        private readonly JsonSerializerSettingsService _jsonSerializerSettingsService;
 
         public DataController(UserManager<IdentityUser> context, InfluxDBClient influxDBClient,
-            IConfiguration configuration, IApplicationDbContext dbcontext)
+            IConfiguration configuration, IApplicationDbContext dbcontext, JsonSerializerSettingsService jsonSerializerSettingsService)
         {
             _context = context;
             _influxDBClient = influxDBClient;
             _bucket = configuration["ConnectionStrings:InfluxDBBucket"];
             _org = configuration["ConnectionStrings:InfluxDBOrg"];
             _dbcontext = dbcontext;
+            _jsonSerializerSettingsService = jsonSerializerSettingsService;
         }
 
         [HttpGet]
@@ -127,7 +130,9 @@ namespace Agri_Smart.Controllers
                 PotassiumValues = potassiumValues,
             };
 
-            return Ok(result);
+            var jsonResponse = _jsonSerializerSettingsService.SerializeObject(result);
+
+            return Ok(jsonResponse);
 
         }    
         [AllowAnonymous]
@@ -249,17 +254,19 @@ namespace Agri_Smart.Controllers
 
             var result = new
             {
-                TemperatureCelsius = latestValues.ContainsKey("temperature_celsius") ? FormatDouble(latestValues["temperature_celsius"]["_value"]) : "",
-                TemperatureFahrenheit = latestValues.ContainsKey("temperature_fahrenheit") ? FormatDouble(latestValues["temperature_fahrenheit"]["_value"]) : "",
-                HumidityPercentage = latestValues.ContainsKey("humidity_percentage") ? FormatDouble(latestValues["humidity_percentage"]["_value"]) : "",
-                Moisture = latestValues.ContainsKey("moisture") ? FormatDouble(latestValues["moisture"]["_value"]) : "",
-                MoisturePercentage = latestValues.ContainsKey("moisture_percentage") ? FormatDouble(latestValues["moisture_percentage"]["_value"]) : "",
-                Nitrogen = latestValues.ContainsKey("nitrogen") ? FormatDouble(latestValues["nitrogen"]["_value"]) : "",
-                Phosphorus = latestValues.ContainsKey("phosphorus") ? FormatDouble(latestValues["phosphorus"]["_value"]) : "",
-                Potassium = latestValues.ContainsKey("potassium") ? FormatDouble(latestValues["potassium"]["_value"]) : ""
+                TemperatureCelsius = latestValues.ContainsKey("temperature_celsius") ? (latestValues["temperature_celsius"]["_value"]) : 0.00,
+                TemperatureFahrenheit = latestValues.ContainsKey("temperature_fahrenheit") ? (latestValues["temperature_fahrenheit"]["_value"]) : 0.00,
+                HumidityPercentage = latestValues.ContainsKey("humidity_percentage") ? (latestValues["humidity_percentage"]["_value"]) : 0.00,
+                Moisture = latestValues.ContainsKey("moisture") ? (latestValues["moisture"]["_value"]) : 0.00,
+                MoisturePercentage = latestValues.ContainsKey("moisture_percentage") ? (latestValues["moisture_percentage"]["_value"]) : 0.00,
+                Nitrogen = latestValues.ContainsKey("nitrogen") ? (latestValues["nitrogen"]["_value"]) : 0.00,
+                Phosphorus = latestValues.ContainsKey("phosphorus") ? (latestValues["phosphorus"]["_value"]) : 0.00,
+                Potassium = latestValues.ContainsKey("potassium") ? (latestValues["potassium"]["_value"]) : 0.00
             };
 
-            return Ok(result);
+            var jsonResponse = _jsonSerializerSettingsService.SerializeObject(result);
+
+            return Ok(jsonResponse);
         }
         [HttpGet]
         [Route("GetAllSensorsLatestData")]
@@ -322,20 +329,21 @@ namespace Agri_Smart.Controllers
 
                 var sensorLatestDat = new SensorDataOutPut
                 {
-                    TenantId = device.TenantId,
-                    DeviceName = device.DeviceName,
-                    TemperatureCelsius = latestValues.ContainsKey("temperature_celsius") ? FormatDouble(latestValues["temperature_celsius"]["_value"]) : null,
-                    TemperatureFahrenheit = latestValues.ContainsKey("temperature_fahrenheit") ? FormatDouble(latestValues["temperature_fahrenheit"]["_value"]) : null,
-                    HumidityPercentage = latestValues.ContainsKey("humidity_percentage") ? FormatDouble(latestValues["humidity_percentage"]["_value"]) : null,
-                    Moisture = latestValues.ContainsKey("moisture") ? FormatDouble(latestValues["moisture"]["_value"]) : null,
-                    MoisturePercentage = latestValues.ContainsKey("moisture_percentage") ? FormatDouble(latestValues["moisture_percentage"]["_value"]) : null,
-                    Nitrogen = latestValues.ContainsKey("nitrogen") ? FormatDouble(latestValues["nitrogen"]["_value"]) : null,
-                    Phosphorus = latestValues.ContainsKey("phosphorus") ? FormatDouble(latestValues["phosphorus"]["_value"]) : null,
-                    Potassium = latestValues.ContainsKey("potassium") ? FormatDouble(latestValues["potassium"]["_value"]) : null
+                    TenantId = device.TenantId ?? "",
+                    DeviceName = device.DeviceName ?? "",
+                    TemperatureCelsius = (double)(latestValues.ContainsKey("temperature_celsius") ? (latestValues["temperature_celsius"]["_value"]) : 0.00),
+                    TemperatureFahrenheit = (double)(latestValues.ContainsKey("temperature_fahrenheit") ? (latestValues["temperature_fahrenheit"]["_value"]) : 0.00),
+                    HumidityPercentage = (double)(latestValues.ContainsKey("humidity_percentage") ? (latestValues["humidity_percentage"]["_value"]) : 0.00),
+                    Moisture = (double)(latestValues.ContainsKey("moisture") ? (latestValues["moisture"]["_value"]) : 0.00),
+                    MoisturePercentage = (double)(latestValues.ContainsKey("moisture_percentage") ? (latestValues["moisture_percentage"]["_value"]) : 0.00),
+                    Nitrogen = (double)(latestValues.ContainsKey("nitrogen") ? (latestValues["nitrogen"]["_value"]) : 0.00),
+                    Phosphorus = (double)(latestValues.ContainsKey("phosphorus") ? (latestValues["phosphorus"]["_value"]) : 0.00),
+                    Potassium = (double)(latestValues.ContainsKey("potassium") ? (latestValues["potassium"]["_value"]) : 0.00)
                 };
                 sensorsLatestDat.Add(sensorLatestDat);
-            }           
-            return Ok(sensorsLatestDat);
+            }
+            var jsonResponse = _jsonSerializerSettingsService.SerializeObject(sensorsLatestDat);
+            return Ok(jsonResponse);
         }
         private string FormatDouble(object value)
         {
@@ -433,7 +441,9 @@ namespace Agri_Smart.Controllers
                 }
             }
 
-            return Ok(Result.ToList());
+            var jsonResponse = _jsonSerializerSettingsService.SerializeObject(Result);
+
+            return Ok(jsonResponse.ToList());
         }
 
         [HttpGet]
@@ -599,8 +609,10 @@ namespace Agri_Smart.Controllers
             userInfoOutPut.UserInfo = UserInfo;
             userInfoOutPut.Tenants = tenants;
 
+            var jsonResponse = _jsonSerializerSettingsService.SerializeObject(userInfoOutPut);
+
             //UserInfo.TenantId = string.Join(",", tenants);
-            return Ok(userInfoOutPut);
+            return Ok(jsonResponse);
         }
 
         [AllowAnonymous]
@@ -620,7 +632,8 @@ namespace Agri_Smart.Controllers
         public async Task<IActionResult> GetDiseases()
         {
             var Diseases = await _dbcontext.Diseases.ToListAsync();
-            return Ok(Diseases);
+            var jsonResponse = _jsonSerializerSettingsService.SerializeObject(Diseases);
+            return Ok(jsonResponse);
         }
         [HttpPost]
         [Route("UpdateFireBaseToken/{fireBaseToken}")]
@@ -681,8 +694,8 @@ namespace Agri_Smart.Controllers
                 {
                     return NotFound("No agronomic practices found.");
                 }
-
-                return Ok(agronomicPracticesDto);
+                var jsonResponse = _jsonSerializerSettingsService.SerializeObject(agronomicPracticesDto);
+                return Ok(jsonResponse);
             }
             catch (Exception ex)
             {
