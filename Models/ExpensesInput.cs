@@ -17,7 +17,7 @@ namespace Agri_Smart.Models
         public List<WorkersExpenses>? Workers { get; set; }
         public List<MachineryExpenses>? Machinery { get; set; }
         public List<OtherExpensesInput>? OtherExpenses { get; set; }
-        public string? TotalCost { get; set; }
+        public double? TotalCost { get; set; }
 
     }
     public class IrrigationDuration 
