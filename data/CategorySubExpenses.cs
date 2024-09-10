@@ -7,17 +7,19 @@ namespace Agri_Smart.data
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public int Id { get; set; }
-        public Guid? CategoryId { get; set; }
-        public Guid? ActivityId { get; set; }
-        public TimeSpan? IrrigationDuration { get; set; }
-        public string? Name { get; set; }
-        public int? Quantity { get; set; }
-        public string? Units { get; set; }
-        public double? Cost { get; set; }
-        public string? Observations { get; set; }
-        public string? Attachments { get; set; }
-        public DateTime? CreatedDate { get; set; }
-        public Guid? UserId { get; set; }
+        public int Id { get; set; } = 0;
+
+        public Guid? CategoryId { get; set; } = Guid.Empty;
+        public Guid? ActivityId { get; set; } = Guid.Empty;
+        public TimeSpan? IrrigationDuration { get; set; } = TimeSpan.Zero;
+        public string? Name { get; set; } = string.Empty;
+        public int? Quantity { get; set; } = 0;
+        public string? Units { get; set; } = string.Empty;
+        public double? Cost { get; set; } = 0.0;
+        public string? Observations { get; set; } = string.Empty;
+        public string? Attachments { get; set; } = string.Empty;
+        public DateTime? CreatedDate { get; set; } = DateTime.Now;
+        public Guid? UserId { get; set; } = Guid.Empty;
     }
+
 }

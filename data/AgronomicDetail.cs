@@ -6,14 +6,15 @@ namespace Agri_Smart.data
     {
         [Key]
         public Guid Id { get; set; }
-        public string? DetailType { get; set; }
-        public string? CoffeeType { get; set; }
-        public string? PlantingPhase { get; set; }
-        public List<string>? Description { get; set; } 
+
+        public string? DetailType { get; set; } = string.Empty;
+        public string? CoffeeType { get; set; } = string.Empty;
+        public string? PlantingPhase { get; set; } = string.Empty;
+        public List<string>? Description { get; set; } = new List<string>();
 
         // Foreign Key
-        public Guid? AgronomicPracticeId { get; set; }
+        public Guid? AgronomicPracticeId { get; set; } = Guid.Empty;
         public AgronomicPractice? AgronomicPractice { get; set; }
-
     }
+
 }

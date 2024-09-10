@@ -5,15 +5,17 @@ namespace Agri_Smart.data
     public class EstimatedYield
     {
         [Key]
-        public Guid Id { get; set; }
-        public Guid? UserId { get; set; }
-        public string? CoffeeVariant { get; set; }
-        public double? Area { get; set; }
-        public double? SoilMoisture { get; set; }
-        public double? Temperature { get; set; }
-        public double? Rainfall { get; set; }
-        public double? PestPresence { get; set; }
-        public double? FinalEstimatedYield { get; set; }
-        public DateTime? CreatedDate { get; set; }
+        public Guid Id { get; set; } = Guid.NewGuid();
+
+        public Guid? UserId { get; set; } = Guid.Empty;
+        public string? CoffeeVariant { get; set; } = string.Empty;
+        public double? Area { get; set; } = 0.0;
+        public double? SoilMoisture { get; set; } = 0.0;
+        public double? Temperature { get; set; } = 0.0;
+        public double? Rainfall { get; set; } = 0.0;
+        public double? PestPresence { get; set; } = 0.0;
+        public double? FinalEstimatedYield { get; set; } = 0.0;
+        public DateTime? CreatedDate { get; set; } = DateTime.Now;
     }
+
 }

@@ -5,11 +5,13 @@ namespace Agri_Smart.data
     public class Devices
     {
         [Key]
-        public Guid Id { get; set; }
-        public Guid? UserId { get; set; }
-        public string? PhoneNumber { get; set; }
-        public string? MacId { get; set; }
-        public string? TenantId { get; set; }
-        public string? DeviceName { get; set; }
+        public Guid Id { get; set; } = Guid.NewGuid();
+
+        public Guid? UserId { get; set; } = Guid.Empty;
+        public string? PhoneNumber { get; set; } = string.Empty;
+        public string? MacId { get; set; } = string.Empty;
+        public string? TenantId { get; set; } = string.Empty;
+        public string? DeviceName { get; set; } = string.Empty;
     }
+
 }

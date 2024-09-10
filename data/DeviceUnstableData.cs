@@ -5,16 +5,18 @@ namespace Agri_Smart.data
     public class DeviceUnstableData
     {
         [Key]
-        public Guid Id { get; set; }
-        public string? MacId { get; set; }
-        public string? TenantId { get; set; }
-        public double? SoilMoistureP { get; set; }
-        public double? SoilMoistureF { get; set; }
-        public double? TemperatureC { get; set; }
-        public double? TemperatureF { get; set; }
-        public double? Humidity { get; set; }
-        public double? Nitrogen { get; set; }
-        public double? Potassium { get; set; }
-        public double? Phosphorus { get; set; }
+        public Guid Id { get; set; } = Guid.NewGuid();
+
+        public string? MacId { get; set; } = string.Empty;
+        public string? TenantId { get; set; } = string.Empty;
+        public double? SoilMoistureP { get; set; } = 0.0;
+        public double? SoilMoistureF { get; set; } = 0.0;
+        public double? TemperatureC { get; set; } = 0.0;
+        public double? TemperatureF { get; set; } = 0.0;
+        public double? Humidity { get; set; } = 0.0;
+        public double? Nitrogen { get; set; } = 0.0;
+        public double? Potassium { get; set; } = 0.0;
+        public double? Phosphorus { get; set; } = 0.0;
     }
+
 }
