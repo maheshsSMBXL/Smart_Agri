@@ -5,7 +5,9 @@ namespace Agri_Smart.data
     public class SubCategory
     {
         [Key]
-        public Guid SubCategoryId { get; set; }
-        public string? SubCategoryName { get; set; }
+        public Guid SubCategoryId { get; set; } = Guid.NewGuid();
+
+        public string? SubCategoryName { get; set; } = string.Empty;
     }
+
 }

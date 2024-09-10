@@ -2,16 +2,17 @@
 {
     public class Intractions
     {
-        public Guid Id { get; set; }        
-        public int? EmailOtp { get; set; }
-        public int? SmsOtp { get; set; }
-        public DateTime? NotBefore { get; set; }
-        public DateTime? NotAfter { get; set; }
-        public string? Email { get; set; }
-        public string? PhoneNumber { get; set; }
-        public bool? EmailVerified { get; set; }
-        public bool? PhoneVerified { get; set; }
-        public Guid? UserId { get; set; }
-        public int? CustomerId { get; set; }
+        public Guid Id { get; set; } = Guid.NewGuid();
+        public int? EmailOtp { get; set; } = 0;
+        public int? SmsOtp { get; set; } = 0;
+        public DateTime? NotBefore { get; set; } = DateTime.MinValue;
+        public DateTime? NotAfter { get; set; } = DateTime.MinValue;
+        public string? Email { get; set; } = string.Empty;
+        public string? PhoneNumber { get; set; } = string.Empty;
+        public bool? EmailVerified { get; set; } = false;
+        public bool? PhoneVerified { get; set; } = false;
+        public Guid? UserId { get; set; } = Guid.Empty;
+        public int? CustomerId { get; set; } = 0;
     }
+
 }
