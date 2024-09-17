@@ -40,7 +40,7 @@ namespace Agri_Smart.Controllers
             var mobileNumber = User?.Claims?.FirstOrDefault(c => c.Type == "MobileNumber")?.Value;
             var userInfo = await _dbcontext.UserInfo.FirstOrDefaultAsync(a => a.PhoneNumber == mobileNumber);
 
-            if (userCalendarEvents.EventID == null || userCalendarEvents.EventID == Guid.NewGuid())
+            if (userCalendarEvents.EventID == null || userCalendarEvents.EventID == Guid.Empty)
             {
                 var EventID = Guid.NewGuid();
                 userCalendarEvents.UserID = userInfo.Id;
