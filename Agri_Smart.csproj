@@ -7,6 +7,16 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="ML_Models\pest_and_disease_model.onnx" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="ML_Models\pest_and_disease_model.onnx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="FirebaseAdmin" Version="3.0.0" />
     <PackageReference Include="InfluxDB.Client" Version="4.17.0" />
     <PackageReference Include="Microsoft.AspNet.WebApi.Client" Version="6.0.0" />
