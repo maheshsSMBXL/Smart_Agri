@@ -39,6 +39,8 @@ namespace Agri_Smart.data
         public DbSet<AgronomicDetail> AgronomicDetail { get; set; }
         public DbSet<EstimatedYield> EstimatedYield { get; set; }
         public DbSet<Transmitters> Transmitters { get; set; }
+        public DbSet<Estates> Estates { get; set; }
+        public DbSet<Farms> Farms { get; set; }
 
         public override int SaveChanges()
         {
