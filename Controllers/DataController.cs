@@ -589,10 +589,28 @@ namespace Agri_Smart.Controllers
 
         [HttpPost]
         [Route("SaveOnBoardData")]
-        public async Task<IActionResult> SaveOnBoardData([FromBody] UserInfo request)
+        public async Task<IActionResult> SaveOnBoardData([FromBody] UserInfoRequest request)
         {
-            request.UserCreatedDate = DateTime.UtcNow;
-            await _dbcontext.UserInfo.AddAsync(request);
+            var userInfo = new UserInfo();
+
+            userInfo.Id = Guid.NewGuid();
+            userInfo.PhoneNumber = request.PhoneNumber;
+            userInfo.Name = request.FullName; 
+            userInfo.Email = request.Email;
+            userInfo.EstateName = request.EstateName;
+            userInfo.OnBoardingStatus = request.OnBoardingStatus;
+            userInfo.UserCreatedDate = DateTime.UtcNow;
+
+            await _dbcontext.UserInfo.AddAsync(userInfo);
+
+            var estate = new Estates();
+            
+            estate.EstateId = Guid.NewGuid();
+            estate.EstateName = request.EstateName;
+            estate.EstateManagerId = userInfo.Id;
+
+            await _dbcontext.Estates.AddAsync(estate);
+
             _dbcontext.SaveChanges();
 
             return Ok(new { Status = "Success", Message = "User OnBoard data saved successfully.", OnBoardStatus = request?.OnBoardingStatus });

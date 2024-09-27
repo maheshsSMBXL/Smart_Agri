@@ -27,6 +27,7 @@ namespace Agri_Smart.data
         public double? Longitude { get; set; } = 0.0;
         public double? BudgetAmount { get; set; } = 0.0;
         public DateTime? UserCreatedDate { get; set; } = DateTime.MinValue;
+        public string? EstateName { get; set; } = string.Empty;
     }
 
 
